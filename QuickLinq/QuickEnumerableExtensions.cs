@@ -3,13 +3,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Cathei.QuickLinq.Quick;
 
 namespace Cathei.QuickLinq
 {
-    public static partial class QuickEnumerableExtensions
+    public static class QuickEnumerableExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, List<T>, ListQuickEnumerator<T>> Quick<T>(this List<T> source)
+        public static QuickEnumerable<T, IList<T>, ListEnumerator<T>> Quick<T>(this IList<T> source)
         {
             return new(source);
         }

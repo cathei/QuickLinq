@@ -3,7 +3,7 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq.Select
+namespace Cathei.QuickLinq.Where
 {
     public struct WhereEnumerator<T, TPredicate, TSource, TEnumerator> :
             IQuickOperation<

@@ -1,6 +1,6 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
-namespace Cathei.QuickLinq.Select
+namespace Cathei.QuickLinq.Where
 {
     public readonly struct WhereSource<T, TPredicate, TSource, TEnumerator>
         where TPredicate : IFunction<T, bool>

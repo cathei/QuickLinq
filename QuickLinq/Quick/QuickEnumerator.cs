@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq
+namespace Cathei.QuickLinq.Quick
 {
     public struct QuickEnumerator<T> :
             IQuickOperation<IEnumerable<T>, QuickEnumerator<T>>, IQuickEnumerator<T>

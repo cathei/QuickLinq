@@ -2,7 +2,7 @@
 
 using System;
 using System.Runtime.CompilerServices;
-using Cathei.QuickLinq.Select;
+using Cathei.QuickLinq.Where;
 
 namespace Cathei.QuickLinq
 {
