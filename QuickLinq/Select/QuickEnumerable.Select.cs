@@ -6,31 +6,24 @@ using Cathei.QuickLinq.Select;
 
 namespace Cathei.QuickLinq
 {
-    public static partial class QuickEnumerable
+    public partial struct QuickEnumerable<T, TSource, TEnumerator>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<TOut,
-                SelectSource<TIn, TOut, TSelector, TSource, TEnumerator>,
-                SelectEnumerator<TIn, TOut, TSelector, TSource, TEnumerator>>
-            Select<TIn, TOut, TSelector, TSource, TEnumerator>(
-                this QuickEnumerable<TIn, TSource, TEnumerator> source, TSelector selector)
-            where TSelector : IFunction<TIn, TOut>
-            where TSource : struct
-            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
+        public QuickEnumerable<TOut,
+                SelectSource<T, TOut, TSelector, TSource, TEnumerator>,
+                SelectEnumerator<T, TOut, TSelector, TSource, TEnumerator>>
+            Select<TOut, TSelector>(in TSelector selector) where TSelector : IFunction<T, TOut>
         {
-            return new(new(source, selector));
+            return new(new(this, selector));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<TOut,
-                SelectSource<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TEnumerator>,
-                SelectEnumerator<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TEnumerator>>
-            Select<TIn, TOut, TSource, TEnumerator>(
-                this QuickEnumerable<TIn, TSource, TEnumerator> source, Func<TIn, TOut> selector)
-            where TSource : struct
-            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
+        public QuickEnumerable<TOut,
+                SelectSource<T, TOut, QuickFunction<T, TOut>, TSource, TEnumerator>,
+                SelectEnumerator<T, TOut, QuickFunction<T, TOut>, TSource, TEnumerator>>
+            Select<TOut>(Func<T, TOut> selector)
         {
-            return new(new(source, new(selector)));
+            return new(new(this, new(selector)));
         }
     }
 }

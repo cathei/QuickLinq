@@ -10,7 +10,7 @@ namespace Cathei.QuickLinq.Select
         internal readonly QuickEnumerable<TIn, TSource, TEnumerator> enumerable;
         internal readonly TSelector selector;
 
-        internal SelectSource(QuickEnumerable<TIn, TSource, TEnumerator> enumerable, TSelector selector)
+        internal SelectSource(in QuickEnumerable<TIn, TSource, TEnumerator> enumerable, in TSelector selector)
         {
             this.enumerable = enumerable;
             this.selector = selector;

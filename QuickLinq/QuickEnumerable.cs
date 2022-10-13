@@ -14,7 +14,7 @@ namespace Cathei.QuickLinq
     {
         private readonly TSource source;
 
-        public QuickEnumerable(TSource source)
+        public QuickEnumerable(in TSource source)
         {
             this.source = source;
         }

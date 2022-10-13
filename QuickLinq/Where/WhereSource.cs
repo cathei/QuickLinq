@@ -10,7 +10,7 @@ namespace Cathei.QuickLinq.Select
         internal readonly QuickEnumerable<T, TSource, TEnumerator> enumerable;
         internal readonly TPredicate predicate;
 
-        internal WhereSource(QuickEnumerable<T, TSource, TEnumerator> enumerable, TPredicate predicate)
+        internal WhereSource(in QuickEnumerable<T, TSource, TEnumerator> enumerable, in TPredicate predicate)
         {
             this.enumerable = enumerable;
             this.predicate = predicate;
