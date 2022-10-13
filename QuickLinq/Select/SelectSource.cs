@@ -4,7 +4,6 @@ namespace Cathei.QuickLinq.Select
 {
     public readonly struct SelectSource<TIn, TOut, TSelector, TSource, TEnumerator>
         where TSelector : IFunction<TIn, TOut>
-        where TSource : struct
         where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
     {
         internal readonly QuickEnumerable<TIn, TSource, TEnumerator> enumerable;

@@ -10,7 +10,6 @@ namespace Cathei.QuickLinq.Select
                 SelectEnumerator<TIn, TOut, TSelector, TSource, TEnumerator>>,
             IQuickEnumerator<TOut>
         where TSelector : IFunction<TIn, TOut>
-        where TSource : struct
         where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
     {
         private readonly TSelector selector;

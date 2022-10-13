@@ -4,7 +4,6 @@ namespace Cathei.QuickLinq.Select
 {
     public readonly struct WhereSource<T, TPredicate, TSource, TEnumerator>
         where TPredicate : IFunction<T, bool>
-        where TSource : struct
         where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
     {
         internal readonly QuickEnumerable<T, TSource, TEnumerator> enumerable;

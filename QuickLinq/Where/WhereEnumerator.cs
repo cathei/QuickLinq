@@ -11,7 +11,6 @@ namespace Cathei.QuickLinq.Select
                 WhereEnumerator<T, TPredicate, TSource, TEnumerator>>,
             IQuickEnumerator<T>
         where TPredicate : IFunction<T, bool>
-        where TSource : struct
         where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
     {
         private readonly TPredicate predicate;
