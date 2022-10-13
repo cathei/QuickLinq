@@ -2,15 +2,15 @@
 
 namespace Cathei.QuickLinq.Select
 {
-    public readonly struct SelectSource<TIn, TOut, TSelector, TSource, TIteration>
+    public readonly struct SelectSource<TIn, TOut, TSelector, TSource, TEnumerator>
         where TSelector : IFunction<TIn, TOut>
         where TSource : struct
-        where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<TIn>
+        where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
     {
-        internal readonly QuickEnumerable<TIn, TSource, TIteration> enumerable;
+        internal readonly QuickEnumerable<TIn, TSource, TEnumerator> enumerable;
         internal readonly TSelector selector;
 
-        internal SelectSource(QuickEnumerable<TIn, TSource, TIteration> enumerable, TSelector selector)
+        internal SelectSource(QuickEnumerable<TIn, TSource, TEnumerator> enumerable, TSelector selector)
         {
             this.enumerable = enumerable;
             this.selector = selector;

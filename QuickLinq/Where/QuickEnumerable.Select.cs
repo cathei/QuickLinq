@@ -10,25 +10,25 @@ namespace Cathei.QuickLinq
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<T,
-                WhereSource<T, TPredicate, TSource, TIteration>,
-                WhereIteration<T, TPredicate, TSource, TIteration>>
-            Where<T, TPredicate, TSource, TIteration>(
-                this QuickEnumerable<T, TSource, TIteration> source, TPredicate predicate)
+                WhereSource<T, TPredicate, TSource, TEnumerator>,
+                WhereEnumerator<T, TPredicate, TSource, TEnumerator>>
+            Where<T, TPredicate, TSource, TEnumerator>(
+                this QuickEnumerable<T, TSource, TEnumerator> source, TPredicate predicate)
             where TPredicate : IFunction<T, bool>
             where TSource : struct
-            where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<T>
+            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
         {
             return new(new(source, predicate));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<T,
-                WhereSource<T, QuickFunction<T, bool>, TSource, TIteration>,
-                WhereIteration<T, QuickFunction<T, bool>, TSource, TIteration>>
-            Select<T, TSource, TIteration>(
-                this QuickEnumerable<T, TSource, TIteration> source, Func<T, bool> predicate)
+                WhereSource<T, QuickFunction<T, bool>, TSource, TEnumerator>,
+                WhereEnumerator<T, QuickFunction<T, bool>, TSource, TEnumerator>>
+            Select<T, TSource, TEnumerator>(
+                this QuickEnumerable<T, TSource, TEnumerator> source, Func<T, bool> predicate)
             where TSource : struct
-            where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<T>
+            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
         {
             return new(new(source, new(predicate)));
         }

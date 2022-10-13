@@ -4,12 +4,12 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Range
 {
-    public struct RangeIteration : IQuickOperation<RangeSource, RangeIteration>, IQuickIteration<int>
+    public struct RangeEnumerator : IQuickOperation<RangeSource, RangeEnumerator>, IQuickEnumerator<int>
     {
         private readonly RangeSource range;
         private int value;
 
-        private RangeIteration(in RangeSource range)
+        private RangeEnumerator(in RangeSource range)
         {
             this.range = range;
             value = range.start - 1;
@@ -22,12 +22,15 @@ namespace Cathei.QuickLinq.Range
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RangeIteration Create(in RangeSource source) => new(source);
+        public RangeEnumerator Create(in RangeSource source) => new(source);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext() => ++value < range.end;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset() => value = range.start - 1;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose() { }
     }
 }

@@ -10,25 +10,25 @@ namespace Cathei.QuickLinq
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<TOut,
-                SelectSource<TIn, TOut, TSelector, TSource, TIteration>,
-                SelectIteration<TIn, TOut, TSelector, TSource, TIteration>>
-            Select<TIn, TOut, TSelector, TSource, TIteration>(
-                this QuickEnumerable<TIn, TSource, TIteration> source, TSelector selector)
+                SelectSource<TIn, TOut, TSelector, TSource, TEnumerator>,
+                SelectEnumerator<TIn, TOut, TSelector, TSource, TEnumerator>>
+            Select<TIn, TOut, TSelector, TSource, TEnumerator>(
+                this QuickEnumerable<TIn, TSource, TEnumerator> source, TSelector selector)
             where TSelector : IFunction<TIn, TOut>
             where TSource : struct
-            where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<TIn>
+            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
         {
             return new(new(source, selector));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<TOut,
-                SelectSource<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TIteration>,
-                SelectIteration<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TIteration>>
-            Select<TIn, TOut, TSource, TIteration>(
-                this QuickEnumerable<TIn, TSource, TIteration> source, Func<TIn, TOut> selector)
+                SelectSource<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TEnumerator>,
+                SelectEnumerator<TIn, TOut, QuickFunction<TIn, TOut>, TSource, TEnumerator>>
+            Select<TIn, TOut, TSource, TEnumerator>(
+                this QuickEnumerable<TIn, TSource, TEnumerator> source, Func<TIn, TOut> selector)
             where TSource : struct
-            where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<TIn>
+            where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<TIn>
         {
             return new(new(source, new(selector)));
         }

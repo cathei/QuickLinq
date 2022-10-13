@@ -3,14 +3,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq
 {
-    public readonly struct QuickEnumerable<T, TSource, TIteration>
-        // : IEnumerable<T>
+    public readonly partial struct QuickEnumerable<T, TSource, TEnumerator> : IEnumerable<T>
         where TSource : struct
-        where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<T>
+        where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
     {
         private readonly TSource source;
 
@@ -20,12 +20,12 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerator<T, TSource, TIteration> GetEnumerator()
+        public TEnumerator GetEnumerator()
         {
-            return new QuickEnumerator<T, TSource, TIteration>(source);
+            return default(TEnumerator).Create(source);
         }
 
-        // IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-
 }

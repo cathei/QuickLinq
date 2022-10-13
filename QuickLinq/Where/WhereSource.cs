@@ -2,15 +2,15 @@
 
 namespace Cathei.QuickLinq.Select
 {
-    public readonly struct WhereSource<T, TPredicate, TSource, TIteration>
+    public readonly struct WhereSource<T, TPredicate, TSource, TEnumerator>
         where TPredicate : IFunction<T, bool>
         where TSource : struct
-        where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<T>
+        where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
     {
-        internal readonly QuickEnumerable<T, TSource, TIteration> enumerable;
+        internal readonly QuickEnumerable<T, TSource, TEnumerator> enumerable;
         internal readonly TPredicate predicate;
 
-        internal WhereSource(QuickEnumerable<T, TSource, TIteration> enumerable, TPredicate predicate)
+        internal WhereSource(QuickEnumerable<T, TSource, TEnumerator> enumerable, TPredicate predicate)
         {
             this.enumerable = enumerable;
             this.predicate = predicate;

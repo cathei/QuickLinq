@@ -1,30 +1,31 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System.Collections;
 using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Select
 {
-    public struct WhereIteration<T, TPredicate, TSource, TIteration> :
+    public struct WhereEnumerator<T, TPredicate, TSource, TEnumerator> :
             IQuickOperation<
-                WhereSource<T, TPredicate, TSource, TIteration>,
-                WhereIteration<T, TPredicate, TSource, TIteration>>,
-            IQuickIteration<T>
+                WhereSource<T, TPredicate, TSource, TEnumerator>,
+                WhereEnumerator<T, TPredicate, TSource, TEnumerator>>,
+            IQuickEnumerator<T>
         where TPredicate : IFunction<T, bool>
         where TSource : struct
-        where TIteration : struct, IQuickOperation<TSource, TIteration>, IQuickIteration<T>
+        where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
     {
         private readonly TPredicate predicate;
-        private QuickEnumerator<T, TSource, TIteration> enumerator;
+        private TEnumerator enumerator;
 
-        private WhereIteration(in WhereSource<T, TPredicate, TSource, TIteration> source)
+        private WhereEnumerator(in WhereSource<T, TPredicate, TSource, TEnumerator> source)
         {
             predicate = source.predicate;
             enumerator = source.enumerable.GetEnumerator();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public WhereIteration<T, TPredicate, TSource, TIteration> Create(
-            in WhereSource<T, TPredicate, TSource, TIteration> source)
+        public WhereEnumerator<T, TPredicate, TSource, TEnumerator> Create(
+            in WhereSource<T, TPredicate, TSource, TEnumerator> source)
         {
             return new(source);
         }
@@ -50,5 +51,8 @@ namespace Cathei.QuickLinq.Select
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset() => enumerator.Reset();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose() => enumerator.Dispose();
     }
 }
