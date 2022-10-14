@@ -8,12 +8,12 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq
 {
-    public readonly partial struct QuickEnumerable<T, TSource, TEnumerator> : IEnumerable<T>
-        where TEnumerator : struct, IQuickOperation<TSource, TEnumerator>, IQuickEnumerator<T>
+    public partial struct QuickEnumerable<T, TEnumerator> : IEnumerable<T>
+        where TEnumerator : struct, IQuickEnumerator<T, TEnumerator>
     {
-        private readonly TSource source;
+        private TEnumerator source;
 
-        public QuickEnumerable(in TSource source)
+        public QuickEnumerable(in TEnumerator source)
         {
             this.source = source;
         }
@@ -21,7 +21,7 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TEnumerator GetEnumerator()
         {
-            return default(TEnumerator).Create(source);
+            return source.GetEnumerator();
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();

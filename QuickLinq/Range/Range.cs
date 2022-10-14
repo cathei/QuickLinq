@@ -1,19 +1,27 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System.Data;
 using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Range
 {
-    public struct RangeEnumerator : IQuickOperation<RangeSource, RangeEnumerator>, IQuickEnumerator<int>
+    public struct Range : IQuickEnumerator<int, Range>
     {
-        private readonly RangeSource range;
+        private readonly int start;
+        private readonly int end;
+
         private int value;
 
-        private RangeEnumerator(in RangeSource range)
+        internal Range(int start, int end)
         {
-            this.range = range;
-            value = range.start - 1;
+            this.start = start;
+            this.end = end;
+
+            value = start - 1;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Range GetEnumerator() => new(start, end);
 
         public int Current
         {
@@ -22,13 +30,10 @@ namespace Cathei.QuickLinq.Range
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RangeEnumerator Create(in RangeSource source) => new(source);
+        public bool MoveNext() => ++value < end;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => ++value < range.end;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => value = range.start - 1;
+        public void Reset() => value = start - 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }

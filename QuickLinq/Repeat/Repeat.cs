@@ -2,30 +2,33 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq.Range
+namespace Cathei.QuickLinq.Repeat
 {
-    public struct RepeatEnumerator<T> : IQuickOperation<RepeatSource<T>, RepeatEnumerator<T>>, IQuickEnumerator<T>
+    public struct Repeat<T> : IQuickEnumerator<T, Repeat<T>>
     {
-        private readonly RepeatSource<T> repeat;
+        internal readonly T element;
+        internal readonly uint count;
         private int index;
 
-        private RepeatEnumerator(in RepeatSource<T> repeat)
+        internal Repeat(in T element, uint count)
         {
-            this.repeat = repeat;
+            this.element = element;
+            this.count = count;
+
             index = -1;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Repeat<T> GetEnumerator() => new(element, count);
 
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => repeat.element;
+            get => element;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public RepeatEnumerator<T> Create(in RepeatSource<T> source) => new(source);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => ++index < repeat.count;
+        public bool MoveNext() => ++index < count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset() => index = -1;

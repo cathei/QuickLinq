@@ -5,22 +5,19 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Quick
 {
-    public struct ListEnumerator<T> : IQuickOperation<IList<T>, ListEnumerator<T>>, IQuickEnumerator<T>
+    public struct QuickenList<T> : IQuickEnumerator<T, QuickenList<T>>
     {
         private readonly IList<T> list;
         private int index;
 
-        private ListEnumerator(in IList<T> list)
+        internal QuickenList(in IList<T> list)
         {
             this.list = list;
             index = -1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ListEnumerator<T> Create(in IList<T> source)
-        {
-            return new(source);
-        }
+        public QuickenList<T> GetEnumerator() => new(list);
 
         public T Current
         {

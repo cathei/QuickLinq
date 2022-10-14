@@ -8,7 +8,7 @@ namespace Cathei.QuickLinq
     public static partial class QuickEnumerable
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<int, RangeSource, RangeEnumerator> Range(int start, int end)
+        public static QuickEnumerable<int, Range.Range> Range(int start, int end)
         {
             return new(new(start, end));
         }

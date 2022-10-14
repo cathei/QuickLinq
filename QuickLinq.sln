@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLinq", "QuickLinq\QuickLinq.csproj", "{18B28292-EA08-44BB-ACE4-E01451F66915}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLinq.Tests", "QuickLinq.Tests\QuickLinq.Tests.csproj", "{07DFC98B-7129-4943-9F7A-8B02644970F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{18B28292-EA08-44BB-ACE4-E01451F66915}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18B28292-EA08-44BB-ACE4-E01451F66915}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18B28292-EA08-44BB-ACE4-E01451F66915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

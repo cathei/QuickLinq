@@ -10,15 +10,15 @@ namespace Cathei.QuickLinq
     public static class QuickEnumerableExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, IList<T>, ListEnumerator<T>> Quick<T>(this IList<T> source)
+        public static QuickEnumerable<T, QuickenList<T>> Quick<T>(this IList<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, IEnumerable<T>, QuickEnumerator<T>> Quick<T>(this IEnumerable<T> source)
+        public static QuickEnumerable<T, Quicken<T>> Quick<T>(this IEnumerable<T> source)
         {
-            return new(source);
+            return new(new(source));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

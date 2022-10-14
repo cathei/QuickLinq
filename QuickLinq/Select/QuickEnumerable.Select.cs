@@ -6,24 +6,18 @@ using Cathei.QuickLinq.Select;
 
 namespace Cathei.QuickLinq
 {
-    public partial struct QuickEnumerable<T, TSource, TEnumerator>
+    public partial struct QuickEnumerable<T, TEnumerator>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<TOut,
-                SelectSource<T, TOut, TSelector, TSource, TEnumerator>,
-                SelectEnumerator<T, TOut, TSelector, TSource, TEnumerator>>
-            Select<TOut, TSelector>(in TSelector selector) where TSelector : IFunction<T, TOut>
+        public QuickEnumerable<TOut, Select<T, TOut, TEnumerator>> Select<TOut>(in QuickFunction<T, TOut> selector)
         {
-            return new(new(this, selector));
+            return new(new(source, selector));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<TOut,
-                SelectSource<T, TOut, QuickFunction<T, TOut>, TSource, TEnumerator>,
-                SelectEnumerator<T, TOut, QuickFunction<T, TOut>, TSource, TEnumerator>>
-            Select<TOut>(Func<T, TOut> selector)
+        public QuickEnumerable<TOut, Select<T, TOut, TEnumerator>> Select<TOut>(Func<T, TOut> selector)
         {
-            return new(new(this, new(selector)));
+            return new(new(source, new(selector)));
         }
     }
 }

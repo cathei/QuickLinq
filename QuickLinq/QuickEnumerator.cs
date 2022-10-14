@@ -6,13 +6,21 @@ using System.Collections.Generic;
 
 namespace Cathei.QuickLinq
 {
-    public interface IQuickEnumerator<out T> : IEnumerator<T>
+    /// <summary>
+    /// IQuickEnumerable is both IEnumerable and IEnumerator
+    /// </summary>
+    public interface IQuickEnumerator<out T, out TSelf> : IEnumerable<T>, IEnumerator<T>
+        where TSelf : IEnumerable<T>, IEnumerator<T>
     {
-        object? IEnumerator.Current => Current;
-    }
+        new TSelf GetEnumerator();
 
-    public interface IQuickOperation<TSource, out TEnumerator>
-    {
-        TEnumerator Create(in TSource source);
+        // interface default implementation
+        object? IEnumerator.Current => Current;
+
+        // interface default implementation
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+
+        // interface default implementation
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
