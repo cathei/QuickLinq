@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq
 {
-    public struct QuickEnumerable<T, TOperation> : IEnumerable<T>
+    public partial struct QuickEnumerable<T, TOperation> : IEnumerable<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
@@ -24,59 +24,6 @@ namespace Cathei.QuickLinq
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T First()
-        {
-            using var enumerator = GetEnumerator();
-            if (enumerator.MoveNext())
-                return enumerator.Current;
-            throw new InvalidOperationException();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T? FirstOrDefault()
-        {
-            using var enumerator = GetEnumerator();
-            return enumerator.MoveNext() ? enumerator.Current : default;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Last()
-        {
-            using var enumerator = GetEnumerator();
-            if (!enumerator.MoveNext())
-                throw new InvalidOperationException();
-
-            T lastValue = enumerator.Current;
-            while (enumerator.MoveNext())
-                lastValue = enumerator.Current;
-
-            return lastValue;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T? LastOrDefault()
-        {
-            using var enumerator = GetEnumerator();
-
-            T? lastValue = default;
-            while (enumerator.MoveNext())
-                lastValue = enumerator.Current;
-
-            return lastValue;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count()
-        {
-            using var enumerator = GetEnumerator();
-            int count = 0;
-
-            while (enumerator.MoveNext())
-                count++;
-            return count;
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QuickEnumerable<TOut, Select<T, TOut, TOperation, TFunc>> Select<TOut, TFunc>(in TFunc selector)
