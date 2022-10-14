@@ -11,7 +11,7 @@ namespace Cathei.QuickLinq
     /// This approach will simplify generic type information.
     /// </summary>
     public interface IQuickOperation<out T, out TSelf> : IEnumerable<T>, IEnumerator<T>
-        where TSelf : IEnumerable<T>, IEnumerator<T>
+        where TSelf : struct, IQuickOperation<T, TSelf>
     {
         new TSelf GetEnumerator();
 

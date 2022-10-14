@@ -15,6 +15,10 @@ public class SelectTests
         CollectionAssert.AreEqual(
             Enumerable.Repeat(from, 1).Select(_ => to),
             QuickEnumerable.Return(from).Select(_ => to));
+
+        CollectionAssert.AreEqual(
+            Enumerable.Repeat(from, 1).Select((x, i) => i),
+            QuickEnumerable.Return(from).Select((x, i) => i));
     }
 }
 
