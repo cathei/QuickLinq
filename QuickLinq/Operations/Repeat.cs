@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Repeat<T> : IQuickEnumerator<T, Repeat<T>>
+    public struct Repeat<T> : IQuickOperation<T, Repeat<T>>
     {
         internal readonly T element;
         internal readonly uint count;

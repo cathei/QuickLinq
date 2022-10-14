@@ -5,20 +5,20 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Where<T, TEnumerator> : IQuickEnumerator<T, Where<T, TEnumerator>>
-        where TEnumerator : struct, IQuickEnumerator<T, TEnumerator>
+    public struct Where<T, TOperation> : IQuickOperation<T, Where<T, TOperation>>
+        where TOperation : struct, IQuickOperation<T, TOperation>
     {
-        private TEnumerator source;
+        private TOperation source;
         private QuickFunction<T, bool> predicate;
 
-        internal Where(in TEnumerator source, in QuickFunction<T, bool> predicate)
+        internal Where(in TOperation source, in QuickFunction<T, bool> predicate)
         {
             this.source = source;
             this.predicate = predicate;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Where<T, TEnumerator> GetEnumerator() => new(source, predicate);
+        public Where<T, TOperation> GetEnumerator() => new(source, predicate);
 
         public T Current
         {

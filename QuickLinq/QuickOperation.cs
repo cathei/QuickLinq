@@ -7,9 +7,10 @@ using System.Collections.Generic;
 namespace Cathei.QuickLinq
 {
     /// <summary>
-    /// IQuickEnumerable is both IEnumerable and IEnumerator
+    /// IQuickOperation is both IEnumerable and IEnumerator.
+    /// This approach will simplify generic type information.
     /// </summary>
-    public interface IQuickEnumerator<out T, out TSelf> : IEnumerable<T>, IEnumerator<T>
+    public interface IQuickOperation<out T, out TSelf> : IEnumerable<T>, IEnumerator<T>
         where TSelf : IEnumerable<T>, IEnumerator<T>
     {
         new TSelf GetEnumerator();

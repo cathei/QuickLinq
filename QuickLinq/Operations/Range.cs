@@ -5,35 +5,35 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Range : IQuickEnumerator<int, Range>
+    public struct Range : IQuickOperation<int, Range>
     {
         private readonly int start;
-        private readonly int end;
+        private readonly int count;
 
         private int value;
 
-        internal Range(int start, int end)
+        internal Range(int start, int count)
         {
             this.start = start;
-            this.end = end;
+            this.count = count;
 
-            value = start - 1;
+            value = -1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Range GetEnumerator() => new(start, end);
+        public Range GetEnumerator() => new(start, count);
 
         public int Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => value;
+            get => start + value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => ++value < end;
+        public bool MoveNext() => ++value < count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => value = start - 1;
+        public void Reset() => value = -1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }

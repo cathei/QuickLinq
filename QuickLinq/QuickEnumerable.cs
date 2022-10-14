@@ -5,12 +5,12 @@ using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq
 {
-    public static partial class QuickEnumerable
+    public static class QuickEnumerable
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<int, Range> Range(int start, int end)
+        public static QuickEnumerable<int, Range> Range(int start, int count)
         {
-            return new(new(start, end));
+            return new(new(start, count));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

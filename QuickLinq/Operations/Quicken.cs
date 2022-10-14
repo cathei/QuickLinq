@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Quick
 {
-    public readonly struct Quicken<T> : IQuickEnumerator<T, Quicken<T>>
+    public readonly struct Quicken<T> : IQuickOperation<T, Quicken<T>>
     {
         private readonly IEnumerable<T>? enumerable;
         private readonly IEnumerator<T>? enumerator;

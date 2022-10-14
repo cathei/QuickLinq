@@ -4,20 +4,20 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Select<TIn, TOut, TEnumerator> : IQuickEnumerator<TOut, Select<TIn, TOut, TEnumerator>>
-        where TEnumerator : struct, IQuickEnumerator<TIn, TEnumerator>
+    public struct Select<TIn, TOut, TOperation> : IQuickOperation<TOut, Select<TIn, TOut, TOperation>>
+        where TOperation : struct, IQuickOperation<TIn, TOperation>
     {
-        private TEnumerator source;
+        private TOperation source;
         private QuickFunction<TIn, TOut> selector;
 
-        internal Select(in TEnumerator source, in QuickFunction<TIn, TOut> selector)
+        internal Select(in TOperation source, in QuickFunction<TIn, TOut> selector)
         {
             this.source = source;
             this.selector = selector;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Select<TIn, TOut, TEnumerator> GetEnumerator() => new(source.GetEnumerator(), selector);
+        public Select<TIn, TOut, TOperation> GetEnumerator() => new(source.GetEnumerator(), selector);
 
         public TOut Current
         {

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Quick
 {
-    public struct QuickenList<T> : IQuickEnumerator<T, QuickenList<T>>
+    public struct QuickenList<T> : IQuickOperation<T, QuickenList<T>>
     {
         private readonly IList<T> list;
         private int index;
