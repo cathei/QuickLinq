@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq.Repeat
+namespace Cathei.QuickLinq.Operations
 {
     public struct Repeat<T> : IQuickEnumerator<T, Repeat<T>>
     {

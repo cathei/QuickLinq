@@ -1,30 +1,22 @@
-﻿// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
+// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq
 {
-    public partial struct QuickEnumerable<T, TEnumerator> : IEnumerable<T>
-        where TEnumerator : struct, IQuickEnumerator<T, TEnumerator>
+    public static partial class QuickEnumerable
     {
-        private TEnumerator source;
-
-        public QuickEnumerable(in TEnumerator source)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static QuickEnumerable<int, Range> Range(int start, int end)
         {
-            this.source = source;
+            return new(new(start, end));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TEnumerator GetEnumerator()
+        public static QuickEnumerable<T, Repeat<T>> Repeat<T>(T element, uint count)
         {
-            return source.GetEnumerator();
+            return new(new(element, count));
         }
-
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

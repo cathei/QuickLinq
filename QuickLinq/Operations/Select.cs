@@ -2,7 +2,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq.Select
+namespace Cathei.QuickLinq.Operations
 {
     public struct Select<TIn, TOut, TEnumerator> : IQuickEnumerator<TOut, Select<TIn, TOut, TEnumerator>>
         where TEnumerator : struct, IQuickEnumerator<TIn, TEnumerator>

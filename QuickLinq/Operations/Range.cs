@@ -3,7 +3,7 @@
 using System.Data;
 using System.Runtime.CompilerServices;
 
-namespace Cathei.QuickLinq.Range
+namespace Cathei.QuickLinq.Operations
 {
     public struct Range : IQuickEnumerator<int, Range>
     {
