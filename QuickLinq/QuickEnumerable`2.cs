@@ -12,7 +12,7 @@ namespace Cathei.QuickLinq
     public struct QuickEnumerable<T, TOperation> : IEnumerable<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
-        private TOperation source;
+        internal TOperation source;
 
         public QuickEnumerable(in TOperation source)
         {
@@ -26,25 +26,27 @@ namespace Cathei.QuickLinq
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<TOut, Select<T, TOut, TOperation>> Select<TOut>(in QuickFunction<T, TOut> selector)
+        public QuickEnumerable<TOut, Select<T, TOut, TOperation, TFunc>> Select<TOut, TFunc>(in TFunc selector)
+            where TFunc : struct, IQuickFunction<T, TOut>
         {
             return new(new(source, selector));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<TOut, Select<T, TOut, TOperation>> Select<TOut>(Func<T, TOut> selector)
+        public QuickEnumerable<TOut, Select<T, TOut, TOperation, Call<T, TOut>>> Select<TOut>(Func<T, TOut> selector)
         {
             return new(new(source, new(selector)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<T, Where<T, TOperation>> Where(in QuickFunction<T, bool> predicate)
+        public QuickEnumerable<T, Where<T, TOperation, TFunc>> Where<TFunc>(in TFunc predicate)
+            where TFunc : struct, IQuickFunction<T, bool>
         {
             return new(new(source, predicate));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<T, Where<T, TOperation>> Where(Func<T, bool> predicate)
+        public QuickEnumerable<T, Where<T, TOperation, Call<T, bool>>> Where(Func<T, bool> predicate)
         {
             return new(new(source, new(predicate)));
         }

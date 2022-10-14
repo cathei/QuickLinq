@@ -5,21 +5,23 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Where<T, TOperation, TFunc> : IQuickOperation<T, Where<T, TOperation, TFunc>>
+    public struct WhereAt<T, TOperation, TFunc> : IQuickOperation<T, WhereAt<T, TOperation, TFunc>>
         where TOperation : struct, IQuickOperation<T, TOperation>
-        where TFunc : struct, IQuickFunction<T, bool>
+        where TFunc : struct, IQuickFunction<T, int, bool>
     {
         private TOperation source;
         private TFunc predicate;
+        private int index;
 
-        internal Where(in TOperation source, in TFunc predicate)
+        internal WhereAt(in TOperation source, in TFunc predicate)
         {
             this.source = source;
             this.predicate = predicate;
+            index = -1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Where<T, TOperation, TFunc> GetEnumerator() => new(source, predicate);
+        public WhereAt<T, TOperation, TFunc> GetEnumerator() => new(source, predicate);
 
         public T Current
         {
@@ -35,13 +37,17 @@ namespace Cathei.QuickLinq.Operations
                 if (!source.MoveNext())
                     return false;
 
-                if (predicate.Invoke(source.Current))
+                if (predicate.Invoke(source.Current, ++index))
                     return true;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => source.Reset();
+        public void Reset()
+        {
+            source.Reset();
+            index = -1;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();

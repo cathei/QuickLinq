@@ -12,7 +12,9 @@ public class RangeTests
     [TestCase(-99, 22)]
     public void TestRange(int start, int end)
     {
-        CollectionAssert.AreEqual(Enumerable.Range(start, end), QuickEnumerable.Range(start, end));
+        CollectionAssert.AreEqual(
+            Enumerable.Range(start, end),
+            QuickEnumerable.Range(start, end));
     }
 }
 

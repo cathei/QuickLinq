@@ -5,21 +5,14 @@ using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq
 {
-    public interface IFunction<in TIn, out TOut>
+    public interface IQuickFunction<in T, out TOut>
     {
-        TOut Invoke(TIn parameter);
+        TOut Invoke(T arg);
     }
 
-    public readonly struct QuickFunction<TIn, TOut> : IFunction<TIn, TOut>
+    public interface IQuickFunction<in T1, in T2, out TOut>
     {
-        private readonly Func<TIn, TOut> selector;
-
-        public QuickFunction(Func<TIn, TOut> selector)
-        {
-            this.selector = selector;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public TOut Invoke(TIn parameter) => selector(parameter);
+        TOut Invoke(T1 arg1, T2 arg2);
     }
+
 }

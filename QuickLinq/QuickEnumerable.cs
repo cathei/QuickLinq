@@ -18,5 +18,11 @@ namespace Cathei.QuickLinq
         {
             return new(new(element, count));
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static QuickEnumerable<T, Return<T>> Return<T>(T element)
+        {
+            return new(new(element));
+        }
     }
 }
