@@ -11,25 +11,47 @@ namespace Cathei.QuickLinq.Collections
     /// Struct represents the borrowed HashSet.
     /// The struct will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
     /// </summary>
-    internal struct PooledSet<T>
+    internal readonly struct PooledSet<T>
     {
-        private HashSet<T> hashSet;
+        private readonly HashSetPool<T>.Item item;
 
-        private PooledSet(HashSet<T> hashSet)
+        private PooledSet(in HashSetPool<T>.Item item)
         {
-            this.hashSet = hashSet;
+            this.item = item;
         }
 
-        public static PooledSet<T> Create()
+        public static PooledSet<T> Create(IEqualityComparer<T>? comparer)
         {
-            return new(HashSetPool<T>.Local.Rent());
+            comparer ??= EqualityComparer<T>.Default;
+
+            var item = HashSetPool<T>.Local.Rent();
+            item.comparer.Init(comparer);
+
+            return new(item);
         }
 
         public void Dispose()
         {
-            if (hashSet != null)
-                HashSetPool<T>.Local.Return(hashSet);
+            if (item.hashSet != null!)
+                HashSetPool<T>.Local.Return(item);
         }
+    }
+
+    /// <summary>
+    /// EqualityComparer paired with pooled HashSet.
+    /// This enables inner implementation swap when borrow HashSet.
+    /// </summary>
+    internal class PooledEqualityComparer<T> : IEqualityComparer<T>
+    {
+        private IEqualityComparer<T>? inner;
+
+        public void Init(IEqualityComparer<T> comparer) => this.inner = comparer;
+
+        public void Clear() => inner = null;
+
+        public bool Equals(T x, T y) => inner!.Equals(x, y);
+
+        public int GetHashCode(T obj) => inner!.GetHashCode(obj);
     }
 
     /// <summary>
@@ -42,21 +64,38 @@ namespace Cathei.QuickLinq.Collections
 
         public static HashSetPool<T> Local => threadLocal.Value;
 
-        private readonly Stack<HashSet<T>> pool = new();
+        public readonly struct Item
+        {
+            public readonly HashSet<T> hashSet;
+            public readonly PooledEqualityComparer<T> comparer;
 
-        public HashSet<T> Rent()
+            public Item(HashSet<T> hashSet, PooledEqualityComparer<T> comparer)
+            {
+                this.hashSet = hashSet;
+                this.comparer = comparer;
+            }
+        }
+
+        private readonly Stack<Item> pool = new();
+
+        public Item Rent()
         {
             if (pool.Count > 0)
                 return pool.Pop();
-            return new();
+
+            var comparer = new PooledEqualityComparer<T>();
+            var hashSet = new HashSet<T>(comparer);
+
+            return new Item(hashSet, comparer);
         }
 
-        public void Return(HashSet<T> list)
+        public void Return(in Item item)
         {
-            // this will clear list items for GC
-            list.Clear();
+            // this will clear hash set and comparer items for GC
+            item.hashSet.Clear();
+            item.comparer.Clear();
 
-            pool.Push(list);
+            pool.Push(item);
         }
     }
 }

@@ -12,9 +12,9 @@ namespace Cathei.QuickLinq.Collections
     /// Struct that represents borrowed List.
     /// The struct will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
     /// </summary>
-    internal struct PooledList<T> : IDisposable
+    internal readonly struct PooledList<T> : IDisposable
     {
-        private List<T> list;
+        internal readonly List<T> list;
 
         private PooledList(List<T> list)
         {
