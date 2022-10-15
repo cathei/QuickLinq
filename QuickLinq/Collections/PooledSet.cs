@@ -1,5 +1,6 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -30,11 +31,18 @@ namespace Cathei.QuickLinq.Collections
             return new(item);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             if (item.hashSet != null!)
                 HashSetPool<T>.Local.Return(item);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Add(T current) => item.hashSet.Add(current);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Clear() => item.hashSet.Clear();
     }
 
     /// <summary>
@@ -45,24 +53,33 @@ namespace Cathei.QuickLinq.Collections
     {
         private IEqualityComparer<T>? inner;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Init(IEqualityComparer<T> comparer) => this.inner = comparer;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear() => inner = null;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(T x, T y) => inner!.Equals(x, y);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetHashCode(T obj) => inner!.GetHashCode(obj);
     }
 
     /// <summary>
     /// HashSetPool itself is not thread-safe, we'll have local HashSetPool per thread.
-    /// It's okay to return HashSet to other thread.
+    /// It's okay to return HashSet to other thread, but TODO consider (sounds like rare case for linq).
     /// </summary>
     internal class HashSetPool<T>
     {
-        private static readonly ThreadLocal<HashSetPool<T>> threadLocal = new(() => new());
+        [ThreadStatic]
+        private static HashSetPool<T>? threadLocal;
 
-        public static HashSetPool<T> Local => threadLocal.Value;
+        public static HashSetPool<T> Local
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => threadLocal ??= new();
+        }
 
         public readonly struct Item
         {

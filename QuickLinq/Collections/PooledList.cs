@@ -14,18 +14,20 @@ namespace Cathei.QuickLinq.Collections
     /// </summary>
     internal readonly struct PooledList<T> : IDisposable
     {
-        internal readonly List<T> list;
+        private readonly List<T> list;
 
         private PooledList(List<T> list)
         {
             this.list = list;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static PooledList<T> Create()
         {
             return new(ListPool<T>.Local.Rent());
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             if (list != null)
@@ -35,16 +37,22 @@ namespace Cathei.QuickLinq.Collections
 
     /// <summary>
     /// ListPool itself is not thread-safe, we'll have local ListPool per thread.
-    /// It's okay to return List to other thread.
+    /// It's okay to return List to other thread, but TODO consider (sounds like rare case for linq).
     /// </summary>
     internal class ListPool<T>
     {
-        private static readonly ThreadLocal<ListPool<T>> threadLocal = new(() => new());
+        [ThreadStatic]
+        private static ListPool<T>? threadLocal;
 
-        public static ListPool<T> Local => threadLocal.Value;
+        public static ListPool<T> Local
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => threadLocal ??= new();
+        }
 
         private readonly Stack<List<T>> pool = new();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public List<T> Rent()
         {
             if (pool.Count > 0)
@@ -52,6 +60,7 @@ namespace Cathei.QuickLinq.Collections
             return new();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Return(List<T> list)
         {
             // this will clear list items for GC
