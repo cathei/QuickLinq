@@ -1,10 +1,8 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Cathei.QuickLinq.Operations;
 using Cathei.QuickLinq.Quick;
 
 namespace Cathei.QuickLinq
@@ -15,7 +13,7 @@ namespace Cathei.QuickLinq
         /// Wrap IList to QuickEnumerable.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, QuickenList<T>> Quick<T>(this IList<T> source)
+        public static QuickEnumerable<T, QuickenList<T>> Quicken<T>(this IList<T> source)
         {
             return new(new(source));
         }
@@ -24,7 +22,7 @@ namespace Cathei.QuickLinq
         /// Wrap IEnumerable to QuickEnumerable.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, Quicken<T>> Quick<T>(this IEnumerable<T> source)
+        public static QuickEnumerable<T, Quicken<T>> Quicken<T>(this IEnumerable<T> source)
         {
             return new(new(source));
         }
