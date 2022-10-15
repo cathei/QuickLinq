@@ -11,6 +11,9 @@ namespace Cathei.QuickLinq
 {
     public partial struct QuickEnumerable<T, TOperation>
     {
+        /// <summary>
+        /// Counts the number of elements in enumerable.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count()
         {
@@ -22,6 +25,9 @@ namespace Cathei.QuickLinq
             return count;
         }
 
+        /// <summary>
+        /// Counts the number of elements in enumerable satisfying given condition.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
@@ -34,6 +40,9 @@ namespace Cathei.QuickLinq
             return count;
         }
 
+        /// <summary>
+        /// Counts the number of elements in enumerable satisfying given condition.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count(Func<T, bool> predicate)
         {
@@ -41,7 +50,7 @@ namespace Cathei.QuickLinq
             int count = 0;
 
             while (enumerator.MoveNext())
-                if (predicate.Invoke(enumerator.Current))
+                if (predicate(enumerator.Current))
                     count++;
             return count;
         }

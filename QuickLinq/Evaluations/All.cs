@@ -11,6 +11,9 @@ namespace Cathei.QuickLinq
 {
     public partial struct QuickEnumerable<T, TOperation>
     {
+        /// <summary>
+        /// Checks if all elements in enumerable satisfies given condition.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool All<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
@@ -22,13 +25,16 @@ namespace Cathei.QuickLinq
             return true;
         }
 
+        /// <summary>
+        /// Checks if all elements in enumerable satisfies given condition.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool All(Func<T, bool> predicate)
         {
             using var enumerator = GetEnumerator();
 
             while (enumerator.MoveNext())
-                if (!predicate.Invoke(enumerator.Current))
+                if (!predicate(enumerator.Current))
                     return false;
             return true;
         }

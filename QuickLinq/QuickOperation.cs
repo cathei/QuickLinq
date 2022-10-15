@@ -7,6 +7,7 @@ using System.Collections.Generic;
 namespace Cathei.QuickLinq
 {
     /// <summary>
+    /// The base class for all operations.
     /// IQuickOperation is both IEnumerable and IEnumerator.
     /// This approach will simplify generic type information.
     /// </summary>

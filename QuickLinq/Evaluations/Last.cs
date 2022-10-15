@@ -11,6 +11,9 @@ namespace Cathei.QuickLinq
 {
     public partial struct QuickEnumerable<T, TOperation>
     {
+        /// <summary>
+        /// Finds last element in the enumerable. Throws exception if enumerable is empty.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Last()
         {
@@ -25,6 +28,9 @@ namespace Cathei.QuickLinq
             return lastValue;
         }
 
+        /// <summary>
+        /// Finds last element in the enumerable. Return default value if enumerable is empty.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? LastOrDefault()
         {

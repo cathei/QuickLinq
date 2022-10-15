@@ -26,6 +26,20 @@ public class WhereSelectSum
         return sum;
     }
 
+    [Benchmark]
+    public double ForEachLoop()
+    {
+        double sum = 0;
+
+        foreach (var i in Enumerable.Range(0, Count))
+        {
+            if (i % 2 == 0)
+                sum += i * 2.0;
+        }
+
+        return sum;
+    }
+
     [Benchmark(Baseline = true)]
     public double Linq()
     {
@@ -51,6 +65,7 @@ public class WhereSelectSum
     {
         var predicate = new Predicate();
         var selector = new Selector();
+
         return QuickEnumerable
                .Range(0, Count)
                .Where(predicate)

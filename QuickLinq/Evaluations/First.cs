@@ -11,6 +11,9 @@ namespace Cathei.QuickLinq
 {
     public partial struct QuickEnumerable<T, TOperation>
     {
+        /// <summary>
+        /// Finds first element in the enumerable. Throws exception if enumerable is empty.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T First()
         {
@@ -20,6 +23,9 @@ namespace Cathei.QuickLinq
             throw new InvalidOperationException();
         }
 
+        /// <summary>
+        /// Finds first element in the enumerable. Return default value if enumerable is empty.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? FirstOrDefault()
         {
@@ -27,6 +33,9 @@ namespace Cathei.QuickLinq
             return enumerator.MoveNext() ? enumerator.Current : default;
         }
 
+        /// <summary>
+        /// Finds a element in the enumerable. Throws exception if the element is not the only element.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Single()
         {
