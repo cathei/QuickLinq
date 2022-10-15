@@ -9,7 +9,7 @@ namespace Cathei.QuickLinq.Operations
     {
         private readonly Func<T, TOut> invoke;
 
-        public Call(System.Func<T, TOut> invoke)
+        public Call(Func<T, TOut> invoke)
         {
             this.invoke = invoke;
         }
@@ -22,7 +22,7 @@ namespace Cathei.QuickLinq.Operations
     {
         private readonly Func<T1, T2, TOut> invoke;
 
-        public Call(System.Func<T1, T2, TOut> invoke)
+        public Call(Func<T1, T2, TOut> invoke)
         {
             this.invoke = invoke;
         }

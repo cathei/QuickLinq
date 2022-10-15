@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq
 {
-    public partial struct QuickEnumerable<T, TOperation> : IEnumerable<T>
+    public partial struct QuickEnumerable<T, TOperation>// : IEnumerable<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
@@ -22,11 +22,15 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TOperation GetEnumerator() => source.GetEnumerator();
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        // IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
+        // IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<TOut, Select<T, TOut, TOperation, TFunc>> Select<TOut, TFunc>(in TFunc selector)
+        public IEnumerable<T> AsEnumerable() => source;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public QuickEnumerable<TOut, Select<T, TOut, TOperation, TFunc>> Select<TOut, TFunc>(
+                in TFunc selector, Func<TFunc, IQuickFunction<T, TOut>> _)
             where TFunc : struct, IQuickFunction<T, TOut>
         {
             return new(new(source, selector));

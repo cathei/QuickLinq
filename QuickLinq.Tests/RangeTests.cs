@@ -1,4 +1,4 @@
-// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
+// QuickLinq.Tests, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
 using System.Linq;
 using NUnit.Framework;
@@ -14,7 +14,7 @@ public class RangeTests
     {
         CollectionAssert.AreEqual(
             Enumerable.Range(start, end),
-            QuickEnumerable.Range(start, end));
+            QuickEnumerable.Range(start, end).AsEnumerable());
     }
 }
 

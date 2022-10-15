@@ -14,5 +14,4 @@ namespace Cathei.QuickLinq
     {
         TOut Invoke(T1 arg1, T2 arg2);
     }
-
 }

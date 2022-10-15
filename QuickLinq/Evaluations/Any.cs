@@ -12,38 +12,32 @@ namespace Cathei.QuickLinq
     public partial struct QuickEnumerable<T, TOperation>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count()
+        public bool Any()
         {
             using var enumerator = GetEnumerator();
-            int count = 0;
-
-            while (enumerator.MoveNext())
-                count++;
-            return count;
+            return enumerator.MoveNext();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
+        public bool Any<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
             using var enumerator = GetEnumerator();
-            int count = 0;
 
             while (enumerator.MoveNext())
                 if (predicate.Invoke(enumerator.Current))
-                    count++;
-            return count;
+                    return true;
+            return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count(Func<T, bool> predicate)
+        public bool Any(Func<T, bool> predicate)
         {
             using var enumerator = GetEnumerator();
-            int count = 0;
 
             while (enumerator.MoveNext())
                 if (predicate.Invoke(enumerator.Current))
-                    count++;
-            return count;
+                    return true;
+            return false;
         }
     }
 }

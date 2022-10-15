@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLinq", "QuickLinq\Quic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLinq.Tests", "QuickLinq.Tests\QuickLinq.Tests.csproj", "{07DFC98B-7129-4943-9F7A-8B02644970F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickLinq.Benchmarks", "QuickLinq.Benchmarks\QuickLinq.Benchmarks.csproj", "{1DDB1032-478A-4233-A327-2A6A2F14F6AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07DFC98B-7129-4943-9F7A-8B02644970F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DDB1032-478A-4233-A327-2A6A2F14F6AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DDB1032-478A-4233-A327-2A6A2F14F6AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DDB1032-478A-4233-A327-2A6A2F14F6AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DDB1032-478A-4233-A327-2A6A2F14F6AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

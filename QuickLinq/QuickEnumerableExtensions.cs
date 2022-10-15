@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Quick;
 
 namespace Cathei.QuickLinq
 {
-    public static class QuickEnumerableExtensions
+    public static partial class QuickEnumerableExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<T, QuickenList<T>> Quick<T>(this IList<T> source)
@@ -32,7 +32,7 @@ namespace Cathei.QuickLinq
         // this has to be extension because signature is same
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static QuickEnumerable<TOut, SelectAt<T, TOut, TOperation, TFunc>> Select<T, TOut, TOperation, TFunc>(
-                in this QuickEnumerable<T, TOperation> enumerable, in TFunc predicate)
+                in this QuickEnumerable<T, TOperation> enumerable, in TFunc predicate, Func<TFunc, IQuickFunction<T, TOut>> _)
             where TFunc : struct, IQuickFunction<T, int, TOut>
             where TOperation : struct, IQuickOperation<T, TOperation>
         {
