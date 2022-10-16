@@ -9,13 +9,15 @@ using NetFabric.Hyperlinq;
 namespace QuickLinq.Benchmarks.Cases;
 
 [MemoryDiagnoser]
-public class OrderByKey : OrderByBenchmarkBase
+public class OrderBySkipTake : OrderByBenchmarkBase
 {
     [Benchmark]
     [ArgumentsSource(nameof(Lists))]
     public double Linq(int[] list)
     {
-        return list.OrderBy(x => -x)
+        return list.OrderBy(x => x)
+            .Skip(10)
+            .Take(10)
             .Sum();
     }
 
@@ -24,7 +26,9 @@ public class OrderByKey : OrderByBenchmarkBase
     public double QuickLinqDelegate(int[] list)
     {
         return list.Quicken()
-            .OrderBy(x => -x)
+            .OrderBy()
+            .Skip(10)
+            .Take(10)
             .Sum();
     }
 
@@ -32,11 +36,10 @@ public class OrderByKey : OrderByBenchmarkBase
     [ArgumentsSource(nameof(Lists))]
     public double QuickLinqStruct(int[] list)
     {
-        var selector = new KeySelector();
-        var comparer = new Comparer();
-
         return list.Quicken()
-            .OrderBy(selector, comparer, x => x)
+            .OrderBy(new Comparer())
+            .Skip(10)
+            .Take(10)
             .Sum();
     }
 
@@ -45,7 +48,9 @@ public class OrderByKey : OrderByBenchmarkBase
     public double StructLinqDelegate(int[] list)
     {
         return list.ToStructEnumerable()
-            .OrderBy(x => -x)
+            .Order()
+            .Skip(10)
+            .Take(10)
             .Sum();
     }
 
@@ -53,28 +58,13 @@ public class OrderByKey : OrderByBenchmarkBase
     [ArgumentsSource(nameof(Lists))]
     public double StructLinqStruct(int[] list)
     {
-        var selector = new KeySelector();
         var comparer = new Comparer();
 
         return list.ToStructEnumerable()
-            .OrderBy(ref selector, ref comparer, x => x, x => x)
+            .Order(ref comparer, x => x)
+            .Skip(10, x => x)
+            .Take(10, x => x)
             .Sum(x => x);
-    }
-
-    readonly struct KeySelector :
-        StructLinq.IFunction<int, int>,
-        NetFabric.Hyperlinq.IFunction<int, int>,
-        IQuickFunction<int, int>
-    {
-        public int Eval(int element)
-        {
-            return -element;
-        }
-
-        public int Invoke(int arg)
-        {
-            return -arg;
-        }
     }
 
     readonly struct Comparer :

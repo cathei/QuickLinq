@@ -8,14 +8,13 @@ using NetFabric.Hyperlinq;
 
 namespace QuickLinq.Benchmarks.Cases;
 
-[MemoryDiagnoser]
-public class OrderBy
+public abstract class OrderByBenchmarkBase
 {
     private static List<int> smallList;
     private static List<int> mediumList;
     private static List<int> largeList;
 
-    static OrderBy()
+    static OrderByBenchmarkBase()
     {
         var rand = new Random(1024);
 
@@ -39,7 +38,11 @@ public class OrderBy
             yield return largeList.ToArray();
         }
     }
+}
 
+[MemoryDiagnoser]
+public class OrderBy : OrderByBenchmarkBase
+{
     [Benchmark]
     [ArgumentsSource(nameof(Lists))]
     public double Linq(int[] list)
