@@ -14,7 +14,7 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static QuickEnumerable<T, Repeat<T>> Repeat<T>(T element, uint count)
+        public static QuickEnumerable<T, Repeat<T>> Repeat<T>(T element, int count)
         {
             return new(new(element, count));
         }

@@ -62,5 +62,7 @@ namespace Cathei.QuickLinq.Operations
             source.Dispose();
             pooledSet.Release();
         }
+
+        public bool IsCollection => false;
     }
 }

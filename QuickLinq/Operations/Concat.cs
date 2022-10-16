@@ -55,5 +55,11 @@ namespace Cathei.QuickLinq.Operations
             first.Dispose();
             second.Dispose();
         }
+
+        public bool IsCollection => first.IsCollection && second.IsCollection;
+
+        public int Count => first.Count + second.Count;
+
+        public T Get(int index) => index < first.Count ? first.Get(index) : second.Get(index);
     }
 }

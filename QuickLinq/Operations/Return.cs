@@ -32,5 +32,11 @@ namespace Cathei.QuickLinq.Operations
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }
+
+        public bool IsCollection => true;
+
+        public int Count => 1;
+
+        public T Get(int _) => element;
     }
 }

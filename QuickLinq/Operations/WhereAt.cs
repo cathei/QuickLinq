@@ -50,5 +50,7 @@ namespace Cathei.QuickLinq.Operations
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
+
+        public bool IsCollection => false;
     }
 }

@@ -13,6 +13,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T First()
         {
+            if (source.IsCollection)
+            {
+                if (source.Count == 0)
+                    throw new InvalidOperationException();
+                return source.Get(0);
+            }
+
             using var enumerator = GetEnumerator();
             if (enumerator.MoveNext())
                 return enumerator.Current;
@@ -25,6 +32,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? FirstOrDefault()
         {
+            if (source.IsCollection)
+            {
+                if (source.Count == 0)
+                    return default;
+                return source.Get(0);
+            }
+
             using var enumerator = GetEnumerator();
             return enumerator.MoveNext() ? enumerator.Current : default;
         }
@@ -35,6 +49,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Single()
         {
+            if (source.IsCollection)
+            {
+                if (source.Count != 1)
+                    throw new InvalidOperationException();
+                return source.Get(0);
+            }
+
             using var enumerator = GetEnumerator();
             if (!enumerator.MoveNext())
                 throw new InvalidOperationException();

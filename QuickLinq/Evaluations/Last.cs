@@ -13,6 +13,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Last()
         {
+            if (source.IsCollection)
+            {
+                if (source.Count == 0)
+                    throw new InvalidOperationException();
+                return source.Get(source.Count - 1);
+            }
+
             using var enumerator = GetEnumerator();
             if (!enumerator.MoveNext())
                 throw new InvalidOperationException();
@@ -30,6 +37,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? LastOrDefault()
         {
+            if (source.IsCollection)
+            {
+                if (source.Count == 0)
+                    return default;
+                return source.Get(source.Count - 1);
+            }
+
             using var enumerator = GetEnumerator();
 
             T? lastValue = default;

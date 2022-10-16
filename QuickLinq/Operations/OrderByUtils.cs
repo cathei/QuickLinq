@@ -8,10 +8,9 @@ using Cathei.QuickLinq.Comparers;
 
 namespace Cathei.QuickLinq.Operations
 {
-    internal static class OrderByUtils<T, TComparer>
-        where TComparer : IOrderByComparer<T>
+    internal static class OrderByUtils<T, TComparer> where TComparer : IOrderByComparer<T>
     {
-        // "Optimal Incremental Sorting"
+        // Optimal incremental sorting
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IncrementalSorting(
                 in PooledList<int> indexesToSort, in PooledList<int> sortingStack, in TComparer comparer, int indexOfIndex)
@@ -30,14 +29,16 @@ namespace Cathei.QuickLinq.Operations
                     return true;
                 }
 
-                // int pivot = QuickSelectPartition(indexesToSort, comparer, indexOfIndex, top);
-                int pivot = QuickSelectPartitionTemp(indexesToSort, comparer, indexOfIndex, top - 1);
+                int pivot = PartitionHoare(indexesToSort, comparer, indexOfIndex, top);
+                // int pivot = PartitionLomuto(indexesToSort, comparer, indexOfIndex, top - 1);
                 sortingStack.Add(pivot);
             }
         }
 
-        // "Hoare Partition Scheme"
-        private static int QuickSelectPartition(
+        // Hoare partition scheme
+        // Starting pivot should be Count - 1
+        // This implementation is faster when using struct comparer (more comparison and less copy)
+        private static int PartitionHoare(
                 in PooledList<int> indexesToSort, TComparer comparer, int left, int right)
         {
             // preventing overflow of the pivot
@@ -75,15 +76,11 @@ namespace Cathei.QuickLinq.Operations
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Compare(int x, int y, TComparer comparer)
-        {
-            int comparison = comparer.Compare(x, y);
-            return comparison != 0 ? comparison : x - y;
-        }
-
-        private static int QuickSelectPartitionTemp(
-            in PooledList<int> indexesToSort, TComparer comparer, int left, int right)
+        // Lomuto partition
+        // Starting pivot should be Count
+        // This implementation is faster when using regular comparer (more copy and less comparison)
+        private static int PartitionLomuto(
+            in PooledList<int> indexesToSort, in TComparer comparer, int left, int right)
         {
             // preventing overflow of the pivot
             int pivot = left + (right - left) / 2;
@@ -100,10 +97,8 @@ namespace Cathei.QuickLinq.Operations
             {
                 int compareIndex = indexesToSort[i];
 
-                int comparison = comparer.Compare(compareIndex, pivotIndex);
-
                 // original index will be used as tiebreaker
-                if (comparison < 0 || (comparison == 0 && compareIndex < pivotIndex))
+                if (Compare(compareIndex, pivotIndex, comparer) < 0)
                 {
                     // swap location
                     indexesToSort[i] = indexesToSort[location];
@@ -119,5 +114,13 @@ namespace Cathei.QuickLinq.Operations
             return location;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Compare(int x, int y, TComparer comparer)
+        {
+            int comparison = comparer.Compare(x, y);
+
+            // original index will be used as tiebreaker
+            return comparison != 0 ? comparison : x - y;
+        }
     }
 }

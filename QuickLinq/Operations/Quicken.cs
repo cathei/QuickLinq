@@ -36,5 +36,7 @@ namespace Cathei.QuickLinq.Quick
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => enumerator!.Dispose();
+
+        public bool IsCollection => false;
     }
 }

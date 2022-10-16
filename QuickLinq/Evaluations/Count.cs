@@ -13,6 +13,9 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count()
         {
+            if (source.IsCollection)
+                return source.Count;
+
             using var enumerator = GetEnumerator();
             int count = 0;
 

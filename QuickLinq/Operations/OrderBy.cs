@@ -57,7 +57,7 @@ namespace Cathei.QuickLinq.Operations
                 indexesToSort.Add(i);
 
              // initial left and right
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         public OrderBy<T, TComparer, TOperation> GetEnumerator()
@@ -99,7 +99,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -111,5 +111,7 @@ namespace Cathei.QuickLinq.Operations
             sortingStack.Release();
             comparer.Dispose();
         }
+
+        public bool IsCollection => false;
     }
 }
