@@ -12,7 +12,7 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct projection comparer.
     /// </summary>
-    public struct Map<T, TKey> : IQuickComparer<T>
+    public struct Map<T, TKey> : IOrderByComparer<T>
     {
         private readonly Func<T, TKey> selector;
         private readonly IComparer<TKey> comparer;
@@ -42,14 +42,14 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            keys.Dispose();
+            keys.Release();
         }
     }
 
     /// <summary>
     /// Struct projection comparer.
     /// </summary>
-    public struct Map<T, TKey, TSelector, TComparer> : IQuickComparer<T>
+    public struct Map<T, TKey, TSelector, TComparer> : IOrderByComparer<T>
         where TSelector : struct, IQuickFunction<T, TKey>
         where TComparer : struct, IQuickFunction<TKey, TKey, int>
     {
@@ -81,7 +81,7 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            keys.Dispose();
+            keys.Release();
         }
     }
 }

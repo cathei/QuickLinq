@@ -12,9 +12,9 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct comparer combining two comparer.
     /// </summary>
-    public struct Then<T, TFirst, TSecond> : IQuickComparer<T>
-        where TFirst : struct, IQuickComparer<T>
-        where TSecond : struct, IQuickComparer<T>
+    public struct Then<T, TFirst, TSecond> : IOrderByComparer<T>
+        where TFirst : struct, IOrderByComparer<T>
+        where TSecond : struct, IOrderByComparer<T>
     {
         private TFirst first;
         private TSecond second;

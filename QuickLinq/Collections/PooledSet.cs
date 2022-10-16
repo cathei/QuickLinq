@@ -11,6 +11,7 @@ namespace Cathei.QuickLinq.Collections
     /// <summary>
     /// Struct represents the borrowed HashSet.
     /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
+    /// TODO use custom hashset implementation that can use PooledList or ArrayPool
     /// </summary>
     public readonly struct PooledSet<T>
     {
@@ -31,8 +32,12 @@ namespace Cathei.QuickLinq.Collections
             return new(item);
         }
 
+        /// <summary>
+        /// Be careful to not dispose multiple times.
+        /// Since it is value type there is no real way to prevent.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
+        internal void Release()
         {
             if (item.hashSet != null!)
                 HashSetPool<T>.Local.Return(item);

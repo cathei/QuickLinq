@@ -60,7 +60,7 @@ namespace Cathei.QuickLinq.Operations
         public void Dispose()
         {
             source.Dispose();
-            pooledSet.Dispose();
+            pooledSet.Release();
         }
     }
 }

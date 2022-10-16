@@ -12,7 +12,7 @@ namespace Cathei.QuickLinq.Collections
     /// Struct that represents borrowed List.
     /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
     /// </summary>
-    public readonly struct PooledList<T> : IDisposable
+    public readonly struct PooledList<T>
     {
         private readonly List<T> list;
 
@@ -27,8 +27,12 @@ namespace Cathei.QuickLinq.Collections
             return new(ListPool<T>.Local.Rent());
         }
 
+        /// <summary>
+        /// Be careful to not dispose multiple times.
+        /// Since it is value type there is no real way to prevent.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
+        internal void Release()
         {
             if (list != null)
                 ListPool<T>.Local.Return(list);

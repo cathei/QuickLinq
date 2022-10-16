@@ -10,10 +10,10 @@ using Cathei.QuickLinq.Operations;
 namespace Cathei.QuickLinq.Comparers
 {
     /// <summary>
-    /// Common interface for comparers.
+    /// Common interface for OrderBy comparers.
     /// Also used as data container of keys.
     /// </summary>
-    public interface IQuickComparer<T> : IDisposable
+    public interface IOrderByComparer<T> : IDisposable
     {
         /// <summary>
         /// Create a list of keys

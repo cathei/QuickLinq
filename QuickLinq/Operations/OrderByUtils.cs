@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Comparers;
 namespace Cathei.QuickLinq.Operations
 {
     internal static class OrderByUtils<T, TComparer>
-        where TComparer : IQuickComparer<T>
+        where TComparer : IOrderByComparer<T>
     {
         // "Optimal Incremental Sorting"
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

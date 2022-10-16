@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Comparers;
 namespace Cathei.QuickLinq.Operations
 {
     public struct OrderBy<T, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TComparer, TOperation>>
-        where TComparer : struct, IQuickComparer<T>
+        where TComparer : struct, IOrderByComparer<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
@@ -106,9 +106,10 @@ namespace Cathei.QuickLinq.Operations
         public void Dispose()
         {
             source.Dispose();
-            indexesToSort.Dispose();
-            elements.Dispose();
-            sortingStack.Dispose();
+            indexesToSort.Release();
+            elements.Release();
+            sortingStack.Release();
+            comparer.Dispose();
         }
     }
 }

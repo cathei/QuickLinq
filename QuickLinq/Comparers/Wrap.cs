@@ -12,7 +12,7 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct comparer, wrapper for IComparer.
     /// </summary>
-    public struct Wrap<T> : IQuickComparer<T>
+    public struct Wrap<T> : IOrderByComparer<T>
     {
         private readonly IComparer<T> comparer;
         private PooledList<T> keys;
@@ -44,7 +44,7 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct comparer, wrapper for struct selector
     /// </summary>
-    public struct Wrap<T, TComparer> : IQuickComparer<T>
+    public struct Wrap<T, TComparer> : IOrderByComparer<T>
         where TComparer : struct, IQuickFunction<T, T, int>
     {
         private TComparer comparer;
