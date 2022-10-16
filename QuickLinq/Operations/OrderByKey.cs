@@ -8,8 +8,8 @@ using Cathei.QuickLinq.Comparers;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct OrderBy<T, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TComparer, TOperation>>
-        where TComparer : struct, IQuickComparer<T, T>
+    public struct OrderByKey<T, TKey, TComparer, TOperation> : IQuickOperation<T, OrderByKey<T, TKey, TComparer, TOperation>>
+        where TComparer : struct, IQuickComparer<T, TKey>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
@@ -17,6 +17,7 @@ namespace Cathei.QuickLinq.Operations
 
         private readonly PooledList<int> sortedIndexes;
         private readonly PooledList<T> elements;
+        private readonly PooledList<TKey> keys;
 
         /// <summary>
         /// Stack used instead of recursive QuickSort.
@@ -26,7 +27,7 @@ namespace Cathei.QuickLinq.Operations
         private int index;
 
         // enumerable constructor
-        internal OrderBy(in TOperation source, in TComparer comparer) : this()
+        internal OrderByKey(in TOperation source, in TComparer comparer) : this()
         {
             this.source = source;
             this.comparer = comparer;
@@ -34,8 +35,8 @@ namespace Cathei.QuickLinq.Operations
 
         // enumerator constructor
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
-        private OrderBy(in TOperation source, in TComparer comparer,
-            in PooledList<int> sortedIndexes, in PooledList<T> elements,
+        private OrderByKey(in TOperation source, in TComparer comparer,
+            in PooledList<int> sortedIndexes, in PooledList<T> elements, in PooledList<TKey> keys,
             in PooledList<(int, int)> sortingStack) : this()
         {
             this.source = source;
@@ -43,6 +44,7 @@ namespace Cathei.QuickLinq.Operations
 
             this.sortedIndexes = sortedIndexes;
             this.elements = elements;
+            this.keys = keys;
             this.sortingStack = sortingStack;
 
             index = -1;
@@ -53,18 +55,18 @@ namespace Cathei.QuickLinq.Operations
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public OrderBy<T, TComparer, TOperation> GetEnumerator()
+        public OrderByKey<T, TKey, TComparer, TOperation> GetEnumerator()
         {
             var enumerator = source.GetEnumerator();
 
             var indexBuffer = PooledList<int>.Create();
             var elementBuffer = PooledList<T>.Create();
-            var rangeBuffer = PooledList<(int, int)>.Create();
+            var keyBuffer = PooledList<TKey>.Create();
 
             while (enumerator.MoveNext())
                 elementBuffer.Add(enumerator.Current);
 
-            return new(enumerator, comparer, indexBuffer, elementBuffer, rangeBuffer);
+            return new(enumerator, comparer, elementBuffer, PooledList<(int, int)>.Create());
         }
 
         public T Current

@@ -13,10 +13,7 @@ namespace Cathei.QuickLinq.Comparers
     /// </summary>
     public interface IQuickComparer<T, TKey>
     {
-        // Is element itself is key? If then we don't have to call selector
-        bool IsElementKey { get; }
         TKey SelectKey(in T element);
-        int Compare(in T x, in T y);
         int Compare(in TKey x, in TKey y);
     }
 }

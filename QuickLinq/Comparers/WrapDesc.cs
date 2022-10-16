@@ -20,8 +20,6 @@ namespace Cathei.QuickLinq.Comparers
             this.comparer = comparer ?? Comparer<T>.Default;
         }
 
-        public bool IsElementKey => true;
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T SelectKey(in T element) => element;
 
@@ -41,8 +39,6 @@ namespace Cathei.QuickLinq.Comparers
         {
             this.comparer = comparer;
         }
-
-        public bool IsElementKey => true;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T SelectKey(in T element) => element;
