@@ -52,6 +52,13 @@ namespace Cathei.QuickLinq.Collections
             list.Add(element);
         }
 
+        // used for stack-like approach
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void RemoveLast()
+        {
+            list.RemoveAt(Count - 1);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {

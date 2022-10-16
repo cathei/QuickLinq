@@ -48,9 +48,9 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<T, OrderBy<T, Desc<T, Wrap<T>>, TOperation>> OrderByDescending(IComparer<T> comparer)
+        public QuickEnumerable<T, OrderBy<T, WrapDesc<T>, TOperation>> OrderByDescending(IComparer<T> comparer)
         {
-            return new(new(source, new(new(comparer))));
+            return new(new(source, new(comparer)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -124,16 +124,16 @@ namespace Cathei.QuickLinq
             return new(new(source.source.source, new(source.source.comparer, new(comparer))));
         }
 
-        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, Desc<T, Wrap<T>>>, TOperation>> ThenByDescending<T, TPrev, TOperation>(
+        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, WrapDesc<T>>, TOperation>> ThenByDescending<T, TPrev, TOperation>(
                 this QuickEnumerable<T, OrderBy<T, TPrev, TOperation>> source, IComparer<T> comparer)
             where TPrev : struct, IQuickFunction<T, T, int>
             where TOperation : struct, IQuickOperation<T, TOperation>
         {
             // replace OrderBy with new OrderBy
-            return new(new(source.source.source, new(source.source.comparer, new(new(comparer)))));
+            return new(new(source.source.source, new(source.source.comparer, new(comparer))));
         }
 
-        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, Map<T, TKey, TSelector, Desc<TKey, TComparer>>>, TOperation>> ThenByDescending<T, TPrev, TKey, TSelector, TComparer, TOperation>(
+        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, MapDesc<T, TKey, TSelector, TComparer>>, TOperation>> ThenByDescending<T, TPrev, TKey, TSelector, TComparer, TOperation>(
                 this QuickEnumerable<T, OrderBy<T, TPrev, TOperation>> source, TSelector keySelector, TComparer comparer)
             where TPrev : struct, IQuickFunction<T, T, int>
             where TSelector : struct, IQuickFunction<T, TKey>
@@ -141,17 +141,17 @@ namespace Cathei.QuickLinq
             where TOperation : struct, IQuickOperation<T, TOperation>
         {
             // replace OrderBy with new OrderBy
-            return new(new(source.source.source, new(source.source.comparer, new(keySelector, new(comparer)))));
+            return new(new(source.source.source, new(source.source.comparer, new(keySelector, comparer))));
         }
 
-        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, Map<T, TKey, Call<T, TKey>, Desc<TKey, Wrap<TKey>>>>, TOperation>> ThenByDescending<T, TPrev, TKey, TOperation>(
+        public static QuickEnumerable<T, OrderBy<T, Then<T, TPrev, MapDesc<T, TKey, Call<T, TKey>, Wrap<TKey>>>, TOperation>> ThenByDescending<T, TPrev, TKey, TOperation>(
                 this QuickEnumerable<T, OrderBy<T, TPrev, TOperation>> source, Func<T, TKey> keySelector, IComparer<TKey> comparer)
             where TPrev : struct, IQuickFunction<T, T, int>
             where TOperation : struct, IQuickOperation<T, TOperation>
         {
             // replace OrderBy with new OrderBy
             return new(new(source.source.source,
-                new(source.source.comparer, new(new(keySelector), new(new(comparer))))));
+                new(source.source.comparer, new(new(keySelector), new(comparer)))));
         }
     }
 }
