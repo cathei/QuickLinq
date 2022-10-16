@@ -132,10 +132,29 @@ namespace Cathei.QuickLinq
             return new(new(source, other.source));
         }
 
+        /// <summary>
+        /// Filter duplicated elements of enumerable.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QuickEnumerable<T, Distinct<T, TOperation>> Distinct(IEqualityComparer<T>? comparer = null)
         {
             return new(new(source, comparer));
+        }
+
+        /// <summary>
+        /// Skip first N elements of enumerable.
+        /// </summary>
+        public QuickEnumerable<T, Skip<T, TOperation>> Skip(int count)
+        {
+            return new(new(source, count));
+        }
+
+        /// <summary>
+        /// Only take first N elements of enumerable.
+        /// </summary>
+        public QuickEnumerable<T, Take<T, TOperation>> Take(int count)
+        {
+            return new(new(source, count));
         }
     }
 }
