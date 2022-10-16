@@ -15,7 +15,11 @@ namespace Cathei.QuickLinq.Operations
         internal TOperation source;
         internal TComparer comparer;
 
-        private readonly PooledList<int> sortedIndexes;
+        private readonly PooledList<int> indexesToSort;
+
+        /// <summary>
+        /// Readonly list of elements.
+        /// </summary>
         private readonly PooledList<T> elements;
 
         /// <summary>
@@ -23,7 +27,7 @@ namespace Cathei.QuickLinq.Operations
         /// </summary>
         private readonly PooledList<(int left, int right)> sortingStack;
 
-        private int index;
+        private int indexOfIndex;
 
         // enumerable constructor
         internal OrderBy(in TOperation source, in TComparer comparer) : this()
@@ -35,24 +39,25 @@ namespace Cathei.QuickLinq.Operations
         // enumerator constructor
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
         private OrderBy(in TOperation source, in TComparer comparer,
-            in PooledList<int> sortedIndexes, in PooledList<T> elements,
+            in PooledList<int> indexesToSort, in PooledList<T> elements,
             in PooledList<(int, int)> sortingStack) : this()
         {
             this.source = source;
             this.comparer = comparer;
 
-            this.sortedIndexes = sortedIndexes;
+            this.indexesToSort = indexesToSort;
             this.elements = elements;
             this.sortingStack = sortingStack;
 
-            index = -1;
+            indexOfIndex = -1;
 
-            // initial left and right
+            for (int i = 0; i < elements.Count; ++i)
+                indexesToSort.Add(i);
+
+             // initial left and right
             sortingStack.Add((0, elements.Count - 1));
-            // QuickSort(0, elements.Count - 1);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public OrderBy<T, TComparer, TOperation> GetEnumerator()
         {
             var enumerator = source.GetEnumerator();
@@ -70,7 +75,7 @@ namespace Cathei.QuickLinq.Operations
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => elements[index];
+            get => elements[indexesToSort[indexOfIndex]];
         }
 
         /// <summary>
@@ -78,59 +83,18 @@ namespace Cathei.QuickLinq.Operations
         /// </summary>
         public bool MoveNext()
         {
-            ++index;
+            ++indexOfIndex;
 
-            do
-            {
-                var (left, right) = sortingStack[^1];
-
-                // pop the stack
-                sortingStack.RemoveLast();
-
-                while (left < right)
-                {
-                    // partial quick sort
-                    int pivot = QuickSort(left, right);
-
-                    // push to stack for further process
-                    sortingStack.Add((pivot + 1, right));
-
-                    // keep the loop go
-                    right = pivot;
-                }
-
-                // if (index <= right)
-                // {
-                //     // no need to pop here, the section is still valid
-                //     return true;
-                // }
-            }
-            while (sortingStack.Count > 0);
-
-            // stack is empty, enumeration is done
-            return false;
-        }
-
-        private int QuickSort(int left, int right)
-        {
-            // preventing overflow of the pivot
-            int pivot = left + (right - left) / 2;
-
-            T pivotValue = elements[pivot];
-
-            for (int i = left; i < right; ++i)
-            {
-
-            }
-
+            return OrderByUtils.QuickSortMoveNext(
+                indexesToSort, elements, sortingStack, comparer, indexOfIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Reset()
         {
-            index = -1;
+            indexOfIndex = -1;
 
-            // initial left and right, at least it is sorted at the point
+            // initial left and right
             sortingStack.Clear();
             sortingStack.Add((0, elements.Count - 1));
         }
@@ -139,7 +103,9 @@ namespace Cathei.QuickLinq.Operations
         public void Dispose()
         {
             source.Dispose();
+            indexesToSort.Dispose();
             elements.Dispose();
+            sortingStack.Dispose();
         }
     }
 }

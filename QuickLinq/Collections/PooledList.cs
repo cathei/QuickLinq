@@ -44,6 +44,8 @@ namespace Cathei.QuickLinq.Collections
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => list[index];
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => list[index] = value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -11,9 +11,16 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Common interface for comparers.
     /// </summary>
-    public interface IQuickComparer<T, TKey>
+    public interface IQuickComparer<TKey>
+    {
+        int Compare(in TKey x, in TKey y);
+    }
+
+    /// <summary>
+    /// Common interface for comparers.
+    /// </summary>
+    public interface IQuickComparer<T, TKey> : IQuickComparer<TKey>
     {
         TKey SelectKey(in T element);
-        int Compare(in TKey x, in TKey y);
     }
 }
