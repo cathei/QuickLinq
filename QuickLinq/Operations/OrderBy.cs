@@ -81,6 +81,7 @@ namespace Cathei.QuickLinq.Operations
         /// <summary>
         /// Partial quicksort as enumeration goes.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
             ++indexOfIndex;

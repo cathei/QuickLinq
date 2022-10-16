@@ -98,6 +98,22 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
     {
         var linqQuery = data
+            .OrderByDescending(x => -x.Item1, comparer)
+            .ThenBy(x => x.Item2);
+
+        var quickQuery = data.Quicken()
+            .OrderByDescending(x => -x.Item1, comparer)
+            .ThenBy(x => x.Item2);
+
+        CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
+    }
+
+    [Test]
+    public void Test_EqualToLinq(
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.IntTupleData))] (int, int)[] data,
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
+    {
+        var linqQuery = data
             .OrderBy(x => -x.Item1, comparer)
             .ThenByDescending(x => x.Item2);
 

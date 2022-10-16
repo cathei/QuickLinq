@@ -52,7 +52,7 @@ namespace Cathei.QuickLinq
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QuickEnumerable<T, OrderByKey<T, TKey, Map<T, TKey, TSelector, TComparer>, TOperation>> OrderBy<TKey, TSelector, TComparer>(
-                TSelector keySelector, TComparer comparer)
+                in TSelector keySelector, in TComparer comparer, Func<TSelector, IQuickFunction<T, TKey>> _)
             where TSelector : struct, IQuickFunction<T, TKey>
             where TComparer : struct, IQuickFunction<TKey, TKey, int>
         {
@@ -68,7 +68,7 @@ namespace Cathei.QuickLinq
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QuickEnumerable<T, OrderByKey<T, TKey, MapDesc<T, TKey, TSelector, TComparer>, TOperation>> OrderByDescending<TKey, TSelector, TComparer>(
-                TSelector keySelector, TComparer comparer)
+                in TSelector keySelector, in TComparer comparer, Func<TSelector, IQuickFunction<T, TKey>> _)
             where TSelector : struct, IQuickFunction<T, TKey>
             where TComparer : struct, IQuickFunction<TKey, TKey, int>
         {
@@ -136,7 +136,7 @@ namespace Cathei.QuickLinq
         }
 
         public static QuickEnumerable<T, OrderByKey<T, (T, TSecondKey), Then<T, T, TFirst, TSecondKey, Map<T, TSecondKey, TSelector, TComparer>>, TOperation>> ThenBy<T, TFirst, TSecondKey, TSelector, TComparer, TOperation>(
-                this QuickEnumerable<T, OrderBy<T, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer)
+                this QuickEnumerable<T, OrderBy<T, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer, Func<TSelector, IQuickFunction<T, TSecondKey>> _)
             where TFirst : struct, IQuickComparer<T, T>
             where TSelector : struct, IQuickFunction<T, TSecondKey>
             where TComparer : struct, IQuickFunction<TSecondKey, TSecondKey, int>
@@ -156,7 +156,7 @@ namespace Cathei.QuickLinq
         }
 
         public static QuickEnumerable<T, OrderByKey<T, (T, TSecondKey), Then<T, T, TFirst, TSecondKey, MapDesc<T, TSecondKey, TSelector, TComparer>>, TOperation>> ThenByDescending<T, TFirst, TSecondKey, TSelector, TComparer, TOperation>(
-                this QuickEnumerable<T, OrderByKey<T, T, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer)
+                this QuickEnumerable<T, OrderByKey<T, T, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer, Func<TSelector, IQuickFunction<T, TSecondKey>> _)
             where TFirst : struct, IQuickComparer<T, T>
             where TSelector : struct, IQuickFunction<T, TSecondKey>
             where TComparer : struct, IQuickFunction<TSecondKey, TSecondKey, int>
@@ -224,7 +224,7 @@ namespace Cathei.QuickLinq
         }
 
         public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, Map<T, TSecondKey, TSelector, TComparer>>, TOperation>> ThenBy<T, TFirstKey, TFirst, TSecondKey, TSelector, TComparer, TOperation>(
-                this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer)
+                this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer, Func<TSelector, IQuickFunction<T, TSecondKey>> _)
             where TFirst : struct, IQuickComparer<T, TFirstKey>
             where TSelector : struct, IQuickFunction<T, TSecondKey>
             where TComparer : struct, IQuickFunction<TSecondKey, TSecondKey, int>
@@ -244,7 +244,7 @@ namespace Cathei.QuickLinq
         }
 
         public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, MapDesc<T, TSecondKey, TSelector, TComparer>>, TOperation>> ThenByDescending<T, TFirstKey, TFirst, TSecondKey, TSelector, TComparer, TOperation>(
-                this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer)
+                this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, TSelector keySelector, TComparer comparer, Func<TSelector, IQuickFunction<T, TSecondKey>> _)
             where TFirst : struct, IQuickComparer<T, TFirstKey>
             where TSelector : struct, IQuickFunction<T, TSecondKey>
             where TComparer : struct, IQuickFunction<TSecondKey, TSecondKey, int>
