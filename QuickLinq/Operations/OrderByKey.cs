@@ -87,7 +87,7 @@ namespace Cathei.QuickLinq.Operations
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => elements[indexOfIndex];
+            get => elements[indexesToSort[indexOfIndex]];
         }
 
         /// <summary>

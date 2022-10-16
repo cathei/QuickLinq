@@ -214,7 +214,7 @@ namespace Cathei.QuickLinq
 
         #region OrderByKey + ThenByKey -> OrderByKey
 
-        public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, Map<T, TSecondKey, Call<T, TSecondKey>>>, TOperation>> ThenBy<T, TFirstKey, TFirst, TSecondKey, TOperation>(
+        public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, Map<T, TSecondKey>>, TOperation>> ThenBy<T, TFirstKey, TFirst, TSecondKey, TOperation>(
                 this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, Func<T, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)
             where TFirst : struct, IQuickComparer<T, TFirstKey>
             where TOperation : struct, IQuickOperation<T, TOperation>
@@ -234,7 +234,7 @@ namespace Cathei.QuickLinq
             return new(new(source.source.source, new(source.source.comparer, new(keySelector, comparer))));
         }
 
-        public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, MapDesc<T, TSecondKey, Call<T, TSecondKey>>>, TOperation>> ThenByDescending<T, TFirstKey, TFirst, TSecondKey, TOperation>(
+        public static QuickEnumerable<T, OrderByKey<T, (TFirstKey, TSecondKey), Then<T, TFirstKey, TFirst, TSecondKey, MapDesc<T, TSecondKey>>, TOperation>> ThenByDescending<T, TFirstKey, TFirst, TSecondKey, TOperation>(
                 this QuickEnumerable<T, OrderByKey<T, TFirstKey, TFirst, TOperation>> source, Func<T, TSecondKey> keySelector, IComparer<TSecondKey>? comparer = null)
             where TFirst : struct, IQuickComparer<T, TFirstKey>
             where TOperation : struct, IQuickOperation<T, TOperation>
