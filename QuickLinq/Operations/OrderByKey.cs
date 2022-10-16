@@ -30,7 +30,7 @@ namespace Cathei.QuickLinq.Operations
         /// <summary>
         /// Stack used instead of recursive QuickSort.
         /// </summary>
-        private readonly PooledList<(int left, int right)> sortingStack;
+        private readonly PooledList<int> sortingStack;
 
         private int indexOfIndex;
 
@@ -45,7 +45,7 @@ namespace Cathei.QuickLinq.Operations
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
         private OrderByKey(in TOperation source, in TComparer comparer,
             in PooledList<int> indexesToSort, in PooledList<T> elements, in PooledList<TKey> keys,
-            in PooledList<(int, int)> sortingStack) : this()
+            in PooledList<int> sortingStack) : this()
         {
             this.source = source;
             this.comparer = comparer;
@@ -61,7 +61,7 @@ namespace Cathei.QuickLinq.Operations
                 indexesToSort.Add(i);
 
             // initial left and right
-            sortingStack.Add((0, elements.Count - 1));
+            sortingStack.Add(elements.Count);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -72,7 +72,7 @@ namespace Cathei.QuickLinq.Operations
             var indexBuffer = PooledList<int>.Create();
             var elementBuffer = PooledList<T>.Create();
             var keyBuffer = PooledList<TKey>.Create();
-            var rangeBuffer = PooledList<(int, int)>.Create();
+            var pivotBuffer = PooledList<int>.Create();
 
             while (enumerator.MoveNext())
             {
@@ -81,7 +81,7 @@ namespace Cathei.QuickLinq.Operations
                 keyBuffer.Add(comparer.SelectKey(current));
             }
 
-            return new(enumerator, comparer, indexBuffer, elementBuffer, keyBuffer, rangeBuffer);
+            return new(enumerator, comparer, indexBuffer, elementBuffer, keyBuffer, pivotBuffer);
         }
 
         public T Current
@@ -98,7 +98,7 @@ namespace Cathei.QuickLinq.Operations
         {
             ++indexOfIndex;
 
-            return OrderByUtils.QuickSortMoveNext(
+            return OrderByUtils.IncrementalSorting(
                 indexesToSort, keys, sortingStack, comparer, indexOfIndex);
         }
 
@@ -109,7 +109,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add((0, elements.Count - 1));
+            sortingStack.Add(elements.Count);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

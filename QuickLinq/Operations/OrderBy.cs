@@ -25,7 +25,7 @@ namespace Cathei.QuickLinq.Operations
         /// <summary>
         /// Stack used instead of recursive QuickSort.
         /// </summary>
-        private readonly PooledList<(int left, int right)> sortingStack;
+        private readonly PooledList<int> sortingStack;
 
         private int indexOfIndex;
 
@@ -39,8 +39,7 @@ namespace Cathei.QuickLinq.Operations
         // enumerator constructor
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
         private OrderBy(in TOperation source, in TComparer comparer,
-            in PooledList<int> indexesToSort, in PooledList<T> elements,
-            in PooledList<(int, int)> sortingStack) : this()
+            in PooledList<int> indexesToSort, in PooledList<T> elements, in PooledList<int> sortingStack) : this()
         {
             this.source = source;
             this.comparer = comparer;
@@ -55,7 +54,7 @@ namespace Cathei.QuickLinq.Operations
                 indexesToSort.Add(i);
 
              // initial left and right
-            sortingStack.Add((0, elements.Count - 1));
+            sortingStack.Add(elements.Count);
         }
 
         public OrderBy<T, TComparer, TOperation> GetEnumerator()
@@ -64,7 +63,7 @@ namespace Cathei.QuickLinq.Operations
 
             var indexBuffer = PooledList<int>.Create();
             var elementBuffer = PooledList<T>.Create();
-            var rangeBuffer = PooledList<(int, int)>.Create();
+            var rangeBuffer = PooledList<int>.Create();
 
             while (enumerator.MoveNext())
                 elementBuffer.Add(enumerator.Current);
@@ -86,7 +85,7 @@ namespace Cathei.QuickLinq.Operations
         {
             ++indexOfIndex;
 
-            return OrderByUtils.QuickSortMoveNext(
+            return OrderByUtils.IncrementalSorting(
                 indexesToSort, elements, sortingStack, comparer, indexOfIndex);
         }
 
@@ -97,7 +96,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add((0, elements.Count - 1));
+            sortingStack.Add(elements.Count);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

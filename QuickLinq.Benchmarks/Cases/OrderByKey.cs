@@ -11,28 +11,46 @@ namespace QuickLinq.Benchmarks.Cases;
 [MemoryDiagnoser]
 public class OrderByKey
 {
-    private const int Count = 10_000;
-
-    private static List<int> list;
+    private static List<int> smallList;
+    private static List<int> mediumList;
+    private static List<int> largeList;
 
     static OrderByKey()
     {
         var rand = new Random(1024);
-        list = new List<int>();
 
-        for (int i = 0; i < Count; i++)
-            list.Add(rand.Next(1000));
+        Fill(smallList = new(), 20, rand);
+        Fill(mediumList = new(), 500, rand);
+        Fill(largeList = new(), 10000, rand);
     }
 
-    [Benchmark(Baseline = true)]
-    public double LinqWithKey()
+    private static void Fill(List<int> list, int count, Random random)
+    {
+        for (int i = 0; i < count; i++)
+            list.Add(random.Next(1000));
+    }
+
+    public static IEnumerable<int[]> Lists
+    {
+        get
+        {
+            yield return smallList.ToArray();
+            yield return mediumList.ToArray();
+            yield return largeList.ToArray();
+        }
+    }
+
+    [Benchmark]
+    [ArgumentsSource(nameof(Lists))]
+    public double Linq(int[] list)
     {
         return list.OrderBy(x => -x)
             .Sum();
     }
 
     [Benchmark]
-    public double QuickLinqDelegate()
+    [ArgumentsSource(nameof(Lists))]
+    public double QuickLinqDelegate(int[] list)
     {
         return list.Quicken()
             .OrderBy(x => -x)
@@ -40,7 +58,8 @@ public class OrderByKey
     }
 
     [Benchmark]
-    public double QuickLinqStruct()
+    [ArgumentsSource(nameof(Lists))]
+    public double QuickLinqStruct(int[] list)
     {
         var selector = new KeySelector();
         var comparer = new Comparer();
@@ -51,7 +70,8 @@ public class OrderByKey
     }
 
     [Benchmark]
-    public double StructLinqDelegate()
+    [ArgumentsSource(nameof(Lists))]
+    public double StructLinqDelegate(int[] list)
     {
         return list.ToStructEnumerable()
             .OrderBy(x => -x)
@@ -59,7 +79,8 @@ public class OrderByKey
     }
 
     [Benchmark]
-    public double StructLinqStruct()
+    [ArgumentsSource(nameof(Lists))]
+    public double StructLinqStruct(int[] list)
     {
         var selector = new KeySelector();
         var comparer = new Comparer();

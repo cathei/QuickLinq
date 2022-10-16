@@ -93,7 +93,7 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
     }
 
     [Test]
-    public void Test_EqualToLinq(
+    public void Test_EqualToLinq_DescAsc(
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.IntTupleData))] (int, int)[] data,
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
     {
@@ -109,7 +109,7 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
     }
 
     [Test]
-    public void Test_EqualToLinq(
+    public void Test_EqualToLinq_AscDesc(
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.IntTupleData))] (int, int)[] data,
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
     {

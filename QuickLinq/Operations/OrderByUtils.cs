@@ -10,9 +10,11 @@ namespace Cathei.QuickLinq.Operations
 {
     internal static class OrderByUtils
     {
-        // reference: https://codeblog.jonskeet.uk/2011/01/07/reimplementing-linq-to-objects-part-26d-fixing-the-key-selectors-and-yielding-early/
-        public static bool QuickSortMoveNext<TKey, TComparer>(
-                in PooledList<int> indexesToSort, in PooledList<TKey> keys, in PooledList<(int, int)> sortingStack,
+        // "Optimal Incremental Sorting"
+        //
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IncrementalSorting<TKey, TComparer>(
+                in PooledList<int> indexesToSort, in PooledList<TKey> keys, in PooledList<int> sortingStack,
                 in TComparer comparer, int indexOfIndex)
             where TComparer : IQuickComparer<TKey>
         {
@@ -20,33 +22,22 @@ namespace Cathei.QuickLinq.Operations
             if (indexOfIndex >= keys.Count)
                 return false;
 
-            while (sortingStack.Count > 0)
+            while (true)
             {
-                // pop to next range
-                var (left, right) = sortingStack[^1];
-                sortingStack.RemoveLast();
+                int top = sortingStack[^1];
 
-                if (left < right)
+                if (indexOfIndex == top)
                 {
-                    // partial quick sort
-                    int pivot = QuickSortPartition(indexesToSort, keys, comparer, left, right);
-
-                    // push to stack for further process
-                    sortingStack.Add((pivot + 1, right));
-                    sortingStack.Add((left, pivot - 1));
-                }
-                else if (indexOfIndex <= right)
-                {
-                    // it's sorted for this range
+                    sortingStack.RemoveLast();
                     return true;
                 }
-            }
 
-            // the sorting is done
-            return true;
+                int pivot = QuickSelectPartition(indexesToSort, keys, comparer, indexOfIndex, top - 1);
+                sortingStack.Add(pivot);
+            }
         }
 
-        private static int QuickSortPartition<TKey, TComparer>(
+        private static int QuickSelectPartition<TKey, TComparer>(
                 in PooledList<int> indexesToSort, in PooledList<TKey> keys, TComparer comparer, int left, int right)
             where TComparer : IQuickComparer<TKey>
         {

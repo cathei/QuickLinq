@@ -11,21 +11,38 @@ namespace QuickLinq.Benchmarks.Cases;
 [MemoryDiagnoser]
 public class ThenBy
 {
-    private const int Count = 10_000;
+    private static List<(int, int, int)> smallList;
+    private static List<(int, int, int)> mediumList;
+    private static List<(int, int, int)> largeList;
 
-    private static List<(int, int, int)> list;
-
-    static ThenBy()
+    static Thenby()
     {
         var rand = new Random(1024);
-        list = new();
 
-        for (int i = 0; i < Count; i++)
-            list.Add((rand.Next(10), rand.Next(10), rand.Next(10)));
+        Fill(smallList = new(), 20, rand);
+        Fill(mediumList = new(), 500, rand);
+        Fill(largeList = new(), 10000, rand);
     }
 
-    [Benchmark(Baseline = true)]
-    public double Linq()
+    private static void Fill(List<(int, int, int)> list, int count, Random random)
+    {
+        for (int i = 0; i < count; i++)
+            list.Add((random.Next(10), random.Next(10), random.Next(10)));
+    }
+
+    public static IEnumerable<(int, int, int)[]> Lists
+    {
+        get
+        {
+            yield return smallList.ToArray();
+            yield return mediumList.ToArray();
+            yield return largeList.ToArray();
+        }
+    }
+
+    [Benchmark]
+    [ArgumentsSource(nameof(Lists))]
+    public double Linq((int, int, int)[] list)
     {
         return list.OrderBy(x => x.Item1)
             .ThenBy(x => x.Item2)
@@ -33,7 +50,8 @@ public class ThenBy
     }
 
     [Benchmark]
-    public double QuickLinqDelegate()
+    [ArgumentsSource(nameof(Lists))]
+    public double QuickLinqDelegate((int, int, int)[] list)
     {
         return list.Quicken()
             .OrderBy(x => x.Item1)
@@ -42,7 +60,8 @@ public class ThenBy
     }
 
     [Benchmark]
-    public double QuickLinqStruct()
+    [ArgumentsSource(nameof(Lists))]
+    public double QuickLinqStruct((int, int, int)[] list)
     {
         return list.Quicken()
             .OrderBy(new KeySelector1(), new Comparer(), x => x)
