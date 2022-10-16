@@ -33,6 +33,30 @@ namespace Cathei.QuickLinq.Collections
             if (list != null)
                 ListPool<T>.Local.Return(list);
         }
+
+        public int Count
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => list.Count;
+        }
+
+        public T this[int index]
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => list[index];
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Add(T element)
+        {
+            list.Add(element);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Clear()
+        {
+            list.Clear();
+        }
     }
 
     /// <summary>

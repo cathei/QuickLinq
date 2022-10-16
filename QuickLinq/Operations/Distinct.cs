@@ -21,7 +21,7 @@ namespace Cathei.QuickLinq.Operations
         }
 
         // enumerator constructor
-        private Distinct(in TOperation source, PooledSet<T> pooledSet) : this()
+        private Distinct(in TOperation source, in PooledSet<T> pooledSet) : this()
         {
             this.source = source;
             this.pooledSet = pooledSet;
