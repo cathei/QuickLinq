@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Cathei.QuickLinq.Collections;
+using Cathei.QuickLinq.Comparers;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct OrderBy<T, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TComparer, TOperation>>
-        where TComparer : struct, IQuickFunction<T, T, int>
+    public struct OrderBy<T, TKey, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TKey, TComparer, TOperation>>
+        where TComparer : struct, IQuickComparer<T, TKey>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
