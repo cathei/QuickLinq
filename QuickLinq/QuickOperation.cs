@@ -25,11 +25,4 @@ namespace Cathei.QuickLinq
         // interface default implementation
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-
-    /// <summary>
-    /// The base class for ordering operations.
-    /// </summary>
-    public interface IQuickOrderOperation<out T, out TSelf> : IQuickOperation<T, TSelf>
-        where TSelf : struct, IQuickOrderOperation<T, TSelf>
-    { }
 }

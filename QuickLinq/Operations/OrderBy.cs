@@ -7,13 +7,12 @@ using Cathei.QuickLinq.Collections;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct OrderBy<T, TComparer, TOperation>
-            : IQuickOrderOperation<T, OrderBy<T, TComparer, TOperation>>
+    public struct OrderBy<T, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TComparer, TOperation>>
         where TComparer : struct, IQuickFunction<T, T, int>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
-        private TOperation source;
-        private TComparer comparer;
+        internal TOperation source;
+        internal TComparer comparer;
         private readonly PooledList<T> pooledList;
         private int index;
 
