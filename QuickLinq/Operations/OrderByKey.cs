@@ -61,7 +61,7 @@ namespace Cathei.QuickLinq.Operations
                 indexesToSort.Add(i);
 
             // initial left and right
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -98,7 +98,7 @@ namespace Cathei.QuickLinq.Operations
         {
             ++indexOfIndex;
 
-            return OrderByUtils.IncrementalSorting(
+            return OrderByUtils<TKey, TComparer>.IncrementalSorting(
                 indexesToSort, keys, sortingStack, comparer, indexOfIndex);
         }
 
@@ -109,7 +109,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

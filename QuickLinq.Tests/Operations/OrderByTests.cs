@@ -13,12 +13,33 @@ namespace Cathei.QuickLinq.Tests;
 
 public static class OrderByTestData
 {
-    public static readonly double[][] DoubleData =
+    static OrderByTestData()
     {
-        new double[] { },
-        new[] { 0.0, 2, -2, 4, 8.1, -4 },
-        new[] { -10.0, 4.0, 999.9, 2.2, -4.0, 4.0 },
-    };
+        Random rng = new Random();
+
+        var randomData1 = GenRandomData(rng, 999);
+        var randomData2 = GenRandomData(rng, 10000);
+
+        DoubleData = new[]
+        {
+            new double[] { },
+            new[] { 0.0, 2, -2, 4, 8.1, -4 },
+            new[] { -10.0, 4.0, 999.9, 2.2, -4.0, 4.0 },
+            randomData1, randomData2
+        };
+    }
+
+    private static double[] GenRandomData(Random rng, int count)
+    {
+        var list = new List<double>();
+
+        for (int i = 0; i < count; ++i)
+            list.Add(rng.NextDouble() * 1000);
+
+        return list.ToArray();
+    }
+
+    public static readonly double[][] DoubleData;
 
     public static readonly (int, int)[][] IntTupleData =
     {
@@ -30,7 +51,7 @@ public static class OrderByTestData
     public static IComparer<double>[] Comparers =
     {
         Comparer<double>.Default,
-        Comparer<double>.Create((x, y) => (int)(y - x))
+        Comparer<double>.Create((x, y) => (int)y - (int)x)
     };
 
 }

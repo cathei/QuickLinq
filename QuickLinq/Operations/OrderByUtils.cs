@@ -8,17 +8,16 @@ using Cathei.QuickLinq.Comparers;
 
 namespace Cathei.QuickLinq.Operations
 {
-    internal static class OrderByUtils
+    internal static class OrderByUtils<TKey, TComparer>
+        where TComparer : IQuickComparer<TKey>
     {
         // "Optimal Incremental Sorting"
-        //
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IncrementalSorting<TKey, TComparer>(
+        public static bool IncrementalSorting(
                 in PooledList<int> indexesToSort, in PooledList<TKey> keys, in PooledList<int> sortingStack,
                 in TComparer comparer, int indexOfIndex)
-            where TComparer : IQuickComparer<TKey>
         {
-            // index out of range
+            // passed last element
             if (indexOfIndex >= keys.Count)
                 return false;
 
@@ -32,49 +31,56 @@ namespace Cathei.QuickLinq.Operations
                     return true;
                 }
 
-                int pivot = QuickSelectPartition(indexesToSort, keys, comparer, indexOfIndex, top - 1);
+                int pivot = QuickSelectPartition(indexesToSort, keys, comparer, indexOfIndex, top);
                 sortingStack.Add(pivot);
             }
         }
 
-        private static int QuickSelectPartition<TKey, TComparer>(
+        // "Hoare Partition Scheme"
+        private static int QuickSelectPartition(
                 in PooledList<int> indexesToSort, in PooledList<TKey> keys, TComparer comparer, int left, int right)
-            where TComparer : IQuickComparer<TKey>
         {
             // preventing overflow of the pivot
             int pivot = left + (right - left) / 2;
-
             int pivotIndex = indexesToSort[pivot];
             var pivotKey = keys[pivotIndex];
 
-            // swap to right
-            indexesToSort[pivot] = indexesToSort[right];
-            indexesToSort[right] = pivotIndex;
+            int i = left - 1;
+            int j = right + 1;
 
-            int location = left;
+            int targetIndex;
 
-            for (int i = left; i < right; ++i)
+            while (true)
             {
-                int compareIndex = indexesToSort[i];
-                var compareKey = keys[compareIndex];
-
-                int comparison = comparer.Compare(compareKey, pivotKey);
-
-                // original index will be used as tiebreaker
-                if (comparison < 0 || (comparison == 0 && compareIndex < pivotIndex))
+                do
                 {
-                    // swap location
-                    indexesToSort[i] = indexesToSort[location];
-                    indexesToSort[location] = compareIndex;
-                    ++location;
-                }
+                    // Move the left index to the right at least once and while the element at
+                    // the left index is less than the pivot
+                    targetIndex = indexesToSort[++i];
+                } while (Compare(keys[targetIndex], pivotKey, targetIndex, pivotIndex, comparer) < 0);
+
+                do
+                {
+                    // Move the right index to the left at least once and while the element at
+                    // the right index is greater than the pivot
+                    targetIndex = indexesToSort[--j];
+                } while (Compare(keys[targetIndex], pivotKey, targetIndex, pivotIndex, comparer) > 0);
+
+                // If the indices crossed, return
+                if (i >= j)
+                    return j;
+
+                // Swap the elements at the left and right indices
+                indexesToSort[j] = indexesToSort[i];
+                indexesToSort[i] = targetIndex;
             }
+        }
 
-            // pivot to the last location
-            indexesToSort[right] = indexesToSort[location];
-            indexesToSort[location] = pivotIndex;
-
-            return location;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int Compare(TKey x, TKey y, int xi, int yi, TComparer comparer)
+        {
+            int comparison = comparer.Compare(x, y);
+            return comparison != 0 ? comparison : xi - yi;
         }
     }
 }

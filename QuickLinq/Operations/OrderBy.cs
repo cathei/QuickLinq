@@ -54,7 +54,7 @@ namespace Cathei.QuickLinq.Operations
                 indexesToSort.Add(i);
 
              // initial left and right
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         public OrderBy<T, TComparer, TOperation> GetEnumerator()
@@ -63,12 +63,12 @@ namespace Cathei.QuickLinq.Operations
 
             var indexBuffer = PooledList<int>.Create();
             var elementBuffer = PooledList<T>.Create();
-            var rangeBuffer = PooledList<int>.Create();
+            var pivotBuffer = PooledList<int>.Create();
 
             while (enumerator.MoveNext())
                 elementBuffer.Add(enumerator.Current);
 
-            return new(enumerator, comparer, indexBuffer, elementBuffer, rangeBuffer);
+            return new(enumerator, comparer, indexBuffer, elementBuffer, pivotBuffer);
         }
 
         public T Current
@@ -85,7 +85,7 @@ namespace Cathei.QuickLinq.Operations
         {
             ++indexOfIndex;
 
-            return OrderByUtils.IncrementalSorting(
+            return OrderByUtils<T, TComparer>.IncrementalSorting(
                 indexesToSort, elements, sortingStack, comparer, indexOfIndex);
         }
 
@@ -96,7 +96,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add(elements.Count);
+            sortingStack.Add(elements.Count - 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

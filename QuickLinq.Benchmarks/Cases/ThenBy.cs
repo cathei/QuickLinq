@@ -15,7 +15,7 @@ public class ThenBy
     private static List<(int, int, int)> mediumList;
     private static List<(int, int, int)> largeList;
 
-    static Thenby()
+    static ThenBy()
     {
         var rand = new Random(1024);
 
