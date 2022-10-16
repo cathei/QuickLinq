@@ -4,23 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Cathei.QuickLinq.Collections;
 using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq.Comparers
 {
     /// <summary>
     /// Common interface for comparers.
+    /// Also used as data container of keys.
     /// </summary>
-    public interface IQuickComparer<TKey>
+    public interface IQuickComparer<T> : IDisposable
     {
-        int Compare(in TKey x, in TKey y);
-    }
+        /// <summary>
+        /// Create a list of keys
+        /// </summary>
+        void Initialize(in PooledList<T> elements);
 
-    /// <summary>
-    /// Common interface for comparers.
-    /// </summary>
-    public interface IQuickComparer<T, TKey> : IQuickComparer<TKey>
-    {
-        TKey SelectKey(in T element);
+        /// <summary>
+        /// Compare with index of keys
+        /// </summary>
+        int Compare(int x, int y);
     }
 }

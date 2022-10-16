@@ -10,9 +10,9 @@ namespace Cathei.QuickLinq.Collections
 {
     /// <summary>
     /// Struct that represents borrowed List.
-    /// The struct will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
+    /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
     /// </summary>
-    internal readonly struct PooledList<T> : IDisposable
+    public readonly struct PooledList<T> : IDisposable
     {
         private readonly List<T> list;
 
@@ -22,7 +22,7 @@ namespace Cathei.QuickLinq.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PooledList<T> Create()
+        internal static PooledList<T> Create()
         {
             return new(ListPool<T>.Local.Rent());
         }
@@ -34,13 +34,13 @@ namespace Cathei.QuickLinq.Collections
                 ListPool<T>.Local.Return(list);
         }
 
-        public int Count
+        internal int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => list.Count;
         }
 
-        public T this[int index]
+        internal T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => list[index];
@@ -49,20 +49,20 @@ namespace Cathei.QuickLinq.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(T element)
+        internal void Add(T element)
         {
             list.Add(element);
         }
 
         // used for stack-like approach
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void RemoveLast()
+        internal void RemoveLast()
         {
             list.RemoveAt(Count - 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear()
+        internal void Clear()
         {
             list.Clear();
         }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Cathei.QuickLinq.Collections;
 using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq.Comparers
@@ -11,9 +12,9 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct comparer combining two comparer.
     /// </summary>
-    public struct Then<T, TFirst, TSecond> : IQuickComparer<T, T>
-        where TFirst : struct, IQuickComparer<T, T>
-        where TSecond : struct, IQuickComparer<T, T>
+    public struct Then<T, TFirst, TSecond> : IQuickComparer<T>
+        where TFirst : struct, IQuickComparer<T>
+        where TSecond : struct, IQuickComparer<T>
     {
         private TFirst first;
         private TSecond second;
@@ -25,47 +26,24 @@ namespace Cathei.QuickLinq.Comparers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T SelectKey(in T element)
+        public void Initialize(in PooledList<T> elements)
         {
-            return element;
+            first.Initialize(elements);
+            second.Initialize(elements);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(in T x, in T y)
+        public int Compare(int x, int y)
         {
             int result = first.Compare(x, y);
             return result != 0 ? result : second.Compare(x, y);
         }
-    }
-
-
-    /// <summary>
-    /// Struct comparer combining two comparer.
-    /// </summary>
-    public struct Then<T, TFirstKey, TFirst, TSecondKey, TSecond> : IQuickComparer<T, (TFirstKey, TSecondKey)>
-        where TFirst : struct, IQuickComparer<T, TFirstKey>
-        where TSecond : struct, IQuickComparer<T, TSecondKey>
-    {
-        private TFirst first;
-        private TSecond second;
-
-        internal Then(in TFirst first, in TSecond second)
-        {
-            this.first = first;
-            this.second = second;
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public (TFirstKey, TSecondKey) SelectKey(in T element)
+        public void Dispose()
         {
-            return (first.SelectKey(element), second.SelectKey(element));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(in (TFirstKey, TSecondKey) x, in (TFirstKey, TSecondKey) y)
-        {
-            int result = first.Compare(x.Item1, y.Item1);
-            return result != 0 ? result : second.Compare(x.Item2, y.Item2);
+            first.Dispose();
+            second.Dispose();
         }
     }
 }

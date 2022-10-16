@@ -9,7 +9,7 @@ using Cathei.QuickLinq.Comparers;
 namespace Cathei.QuickLinq.Operations
 {
     public struct OrderBy<T, TComparer, TOperation> : IQuickOperation<T, OrderBy<T, TComparer, TOperation>>
-        where TComparer : struct, IQuickComparer<T, T>
+        where TComparer : struct, IQuickComparer<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         internal TOperation source;
@@ -48,13 +48,16 @@ namespace Cathei.QuickLinq.Operations
             this.elements = elements;
             this.sortingStack = sortingStack;
 
+            // initialize copied comparer
+            this.comparer.Initialize(elements);
+
             indexOfIndex = -1;
 
             for (int i = 0; i < elements.Count; ++i)
                 indexesToSort.Add(i);
 
              // initial left and right
-            sortingStack.Add(elements.Count - 1);
+            sortingStack.Add(elements.Count);
         }
 
         public OrderBy<T, TComparer, TOperation> GetEnumerator()
@@ -86,7 +89,7 @@ namespace Cathei.QuickLinq.Operations
             ++indexOfIndex;
 
             return OrderByUtils<T, TComparer>.IncrementalSorting(
-                indexesToSort, elements, sortingStack, comparer, indexOfIndex);
+                indexesToSort, sortingStack, comparer, indexOfIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -96,7 +99,7 @@ namespace Cathei.QuickLinq.Operations
 
             // initial left and right
             sortingStack.Clear();
-            sortingStack.Add(elements.Count - 1);
+            sortingStack.Add(elements.Count);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

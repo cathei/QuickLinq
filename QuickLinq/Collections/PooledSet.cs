@@ -10,9 +10,9 @@ namespace Cathei.QuickLinq.Collections
 {
     /// <summary>
     /// Struct represents the borrowed HashSet.
-    /// The struct will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
+    /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
     /// </summary>
-    internal readonly struct PooledSet<T>
+    public readonly struct PooledSet<T>
     {
         private readonly HashSetPool<T>.Item item;
 
@@ -21,7 +21,7 @@ namespace Cathei.QuickLinq.Collections
             this.item = item;
         }
 
-        public static PooledSet<T> Create(IEqualityComparer<T>? comparer)
+        internal static PooledSet<T> Create(IEqualityComparer<T>? comparer)
         {
             comparer ??= EqualityComparer<T>.Default;
 
@@ -39,10 +39,10 @@ namespace Cathei.QuickLinq.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Add(T current) => item.hashSet.Add(current);
+        internal bool Add(T current) => item.hashSet.Add(current);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => item.hashSet.Clear();
+        internal void Clear() => item.hashSet.Clear();
     }
 
     /// <summary>

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using Cathei.QuickLinq.Collections;
 using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq.Comparers
@@ -11,39 +12,65 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct comparer, wrapper for IComparer, descending order.
     /// </summary>
-    public readonly struct WrapDesc<T> : IQuickComparer<T, T>
+    public struct WrapDesc<T> : IQuickComparer<T>
     {
         private readonly IComparer<T> comparer;
+        private PooledList<T> keys;
 
-        internal WrapDesc(IComparer<T>? comparer)
+        internal WrapDesc(IComparer<T>? comparer) : this()
         {
             this.comparer = comparer ?? Comparer<T>.Default;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T SelectKey(in T element) => element;
+        public void Initialize(in PooledList<T> elements)
+        {
+            keys = elements;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(in T x, in T y) => -comparer.Compare(x, y);
+        public int Compare(int x, int y)
+        {
+            return comparer.Compare(keys[y], keys[x]);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            // do nothing
+        }
     }
 
     /// <summary>
-    /// Struct comparer, wrapper for struct selector
+    /// Struct comparer, wrapper for struct selector, descending order
     /// </summary>
-    public struct WrapDesc<T, TComparer> : IQuickComparer<T, T>
+    public struct WrapDesc<T, TComparer> : IQuickComparer<T>
         where TComparer : struct, IQuickFunction<T, T, int>
     {
         private TComparer comparer;
+        private PooledList<T> keys;
 
-        internal WrapDesc(in TComparer comparer)
+        internal WrapDesc(in TComparer comparer) : this()
         {
             this.comparer = comparer;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T SelectKey(in T element) => element;
+        public void Initialize(in PooledList<T> elements)
+        {
+            keys = elements;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(in T x, in T y) => -comparer.Invoke(x, y);
+        public int Compare(int x, int y)
+        {
+            return comparer.Invoke(keys[y], keys[x]);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            // do nothing
+        }
     }
 }

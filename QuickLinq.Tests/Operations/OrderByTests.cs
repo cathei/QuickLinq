@@ -29,7 +29,7 @@ public static class OrderByTestData
         };
     }
 
-    private static double[] GenRandomData(Random rng, int count)
+    public static double[] GenRandomData(Random rng, int count)
     {
         var list = new List<double>();
 
@@ -51,6 +51,7 @@ public static class OrderByTestData
     public static IComparer<double>[] Comparers =
     {
         Comparer<double>.Default,
+        // this will test stable sorting
         Comparer<double>.Create((x, y) => (int)y - (int)x)
     };
 
@@ -75,9 +76,28 @@ public class OrderByTests : OperationTestBase<int, OrderBy<int, Wrap<int>, Quick
     }
 }
 
-public class OrderByKeyTests : OperationTestBase<int, OrderByKey<int, double, Map<int, double>, Quicken<int>>>
+public class OrderByDescTests : OperationTestBase<int, OrderBy<int, WrapDesc<int>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderByKey<int, double, Map<int, double>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, WrapDesc<int>, Quicken<int>>> Build(int size)
+    {
+        return Enumerable.Range(-2, size).Quicken().OrderByDescending();
+    }
+
+    [Test]
+    public void Test_EqualToLinq(
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.DoubleData))] IEnumerable<double> data,
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
+    {
+        var linqQuery = data.OrderByDescending(x => x, comparer);
+        var quickQuery = data.Quicken().OrderByDescending(comparer);
+
+        CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
+    }
+}
+
+public class OrderByKeyTests : OperationTestBase<int, OrderBy<int, Map<int, double>, Quicken<int>>>
+{
+    protected override QuickEnumerable<int, OrderBy<int, Map<int, double>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Reverse().Quicken().
             OrderBy(x => Math.Abs(x * 2.0));
@@ -90,6 +110,26 @@ public class OrderByKeyTests : OperationTestBase<int, OrderByKey<int, double, Ma
     {
         var linqQuery = data.OrderBy(x => -x, comparer);
         var quickQuery = data.Quicken().OrderBy(x => -x, comparer);
+
+        CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
+    }
+}
+
+public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>>
+{
+    protected override QuickEnumerable<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>> Build(int size)
+    {
+        return Enumerable.Range(-2, size).Quicken().
+            OrderByDescending(x => Math.Abs(x * 2.0));
+    }
+
+    [Test]
+    public void Test_EqualToLinq(
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.DoubleData))] IEnumerable<double> data,
+        [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
+    {
+        var linqQuery = data.OrderByDescending(x => -x, comparer);
+        var quickQuery = data.Quicken().OrderByDescending(x => -x, comparer);
 
         CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
     }
@@ -143,5 +183,21 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
             .ThenByDescending(x => x.Item2);
 
         CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
+    }
+
+    [Test]
+    public void PerformanceProfile()
+    {
+        Random rng = new Random();
+
+        var randomData = OrderByTestData.GenRandomData(rng, 999);
+        double x = 0;
+
+        for (int i = 0; i < 1000; ++i)
+        {
+            x += randomData.Quicken().OrderBy().Sum();
+        }
+
+        Assert.AreNotEqual(0, x);
     }
 }
