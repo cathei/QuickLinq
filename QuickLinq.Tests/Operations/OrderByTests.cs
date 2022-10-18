@@ -76,9 +76,9 @@ public class OrderByTests : OperationTestBase<int, OrderBy<int, Wrap<int>, Quick
     }
 }
 
-public class OrderByDescTests : OperationTestBase<int, OrderBy<int, WrapDesc<int>, Quicken<int>>>
+public class OrderByDescTests : OperationTestBase<int, OrderBy<int, Wrap<int>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, WrapDesc<int>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Wrap<int>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Quicken().OrderByDescending();
     }
@@ -115,9 +115,9 @@ public class OrderByKeyTests : OperationTestBase<int, OrderBy<int, Map<int, doub
     }
 }
 
-public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>>
+public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, Map<int, double>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Map<int, double>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Quicken().
             OrderByDescending(x => Math.Abs(x * 2.0));
@@ -135,7 +135,7 @@ public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<i
     }
 }
 
-public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<int, ThenByTests.Comparer>, WrapDesc<int>>, Quicken<int>>>
+public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<int, ThenByTests.Comparer>, Wrap<int>>, Quicken<int>>>
 {
     public struct Comparer : IQuickFunction<int, int, int>
     {
@@ -147,7 +147,7 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
         }
     }
 
-    protected override QuickEnumerable<int, OrderBy<int, Then<int, Wrap<int, Comparer>, WrapDesc<int>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Then<int, Wrap<int, Comparer>, Wrap<int>>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Reverse().Quicken().
             OrderBy(new Comparer()).ThenByDescending();

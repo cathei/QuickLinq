@@ -16,12 +16,14 @@ namespace Cathei.QuickLinq.Comparers
     {
         private readonly Func<T, TKey> selector;
         private readonly IComparer<TKey> comparer;
+        private readonly bool descending;
         private PooledList<TKey> keys;
 
-        internal Map(Func<T, TKey> selector, IComparer<TKey>? comparer) : this()
+        internal Map(Func<T, TKey> selector, IComparer<TKey>? comparer, bool descending) : this()
         {
             this.selector = selector;
             this.comparer = comparer ?? Comparer<TKey>.Default;
+            this.descending = descending;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -36,7 +38,9 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y)
         {
-            return comparer.Compare(keys[x], keys[y]);
+            return descending ?
+                comparer.Compare(keys[y], keys[x]) :
+                comparer.Compare(keys[x], keys[y]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -55,12 +59,14 @@ namespace Cathei.QuickLinq.Comparers
     {
         private TSelector selector;
         private TComparer comparer;
+        private readonly bool descending;
         private PooledList<TKey> keys;
 
-        internal Map(in TSelector selector, in TComparer comparer) : this()
+        internal Map(in TSelector selector, in TComparer comparer, bool descending) : this()
         {
             this.selector = selector;
             this.comparer = comparer;
+            this.descending = descending;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -75,7 +81,9 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y)
         {
-            return comparer.Invoke(keys[x], keys[y]);
+            return descending ?
+                comparer.Invoke(keys[y], keys[x]) :
+                comparer.Invoke(keys[x], keys[y]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

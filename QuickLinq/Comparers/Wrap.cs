@@ -15,11 +15,13 @@ namespace Cathei.QuickLinq.Comparers
     public struct Wrap<T> : IOrderByComparer<T>
     {
         private readonly IComparer<T> comparer;
+        private readonly bool descending;
         private PooledList<T> keys;
 
-        internal Wrap(IComparer<T>? comparer) : this()
+        internal Wrap(IComparer<T>? comparer, bool descending) : this()
         {
             this.comparer = comparer ?? Comparer<T>.Default;
+            this.descending = descending;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -31,7 +33,9 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y)
         {
-            return comparer.Compare(keys[x], keys[y]);
+            return descending ?
+                comparer.Compare(keys[y], keys[x]) :
+                comparer.Compare(keys[x], keys[y]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -48,11 +52,13 @@ namespace Cathei.QuickLinq.Comparers
         where TComparer : struct, IQuickFunction<T, T, int>
     {
         private TComparer comparer;
+        private readonly bool descending;
         private PooledList<T> keys;
 
-        internal Wrap(in TComparer comparer) : this()
+        internal Wrap(in TComparer comparer, bool descending) : this()
         {
             this.comparer = comparer;
+            this.descending = descending;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -64,7 +70,9 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y)
         {
-            return comparer.Invoke(keys[x], keys[y]);
+            return descending ?
+                comparer.Invoke(keys[y], keys[x]) :
+                comparer.Invoke(keys[x], keys[y]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
