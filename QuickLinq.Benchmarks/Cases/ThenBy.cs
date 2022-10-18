@@ -96,10 +96,9 @@ public class ThenBy
         }
     }
 
-    readonly struct Comparer :
-        IQuickFunction<int, int, int>
+    readonly struct Comparer : IComparer<int>
     {
-        public int Invoke(int arg1, int arg2)
+        public int Compare(int arg1, int arg2)
         {
             return arg1 - arg2;
         }

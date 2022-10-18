@@ -12,47 +12,9 @@ namespace Cathei.QuickLinq.Comparers
     /// <summary>
     /// Struct projection comparer.
     /// </summary>
-    public struct MapDesc<T, TKey> : IOrderByComparer<T>
-    {
-        private readonly Func<T, TKey> selector;
-        private readonly IComparer<TKey> comparer;
-        private PooledList<TKey> keys;
-
-        internal MapDesc(Func<T, TKey> selector, IComparer<TKey>? comparer) : this()
-        {
-            this.selector = selector;
-            this.comparer = comparer ?? Comparer<TKey>.Default;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(PooledList<T> elements)
-        {
-            keys = new PooledList<TKey>(elements.Count);
-
-            for (int i = 0; i < elements.Count; ++i)
-                keys.Add(selector.Invoke(elements[i]));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Compare(int x, int y)
-        {
-            return comparer.Compare(keys[y], keys[x]);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Dispose()
-        {
-            keys.Dispose();
-        }
-
-    }
-
-    /// <summary>
-    /// Struct projection comparer.
-    /// </summary>
     public struct MapDesc<T, TKey, TSelector, TComparer> : IOrderByComparer<T>
         where TSelector : struct, IQuickFunction<T, TKey>
-        where TComparer : struct, IQuickFunction<TKey, TKey, int>
+        where TComparer : IComparer<TKey>
     {
         private TSelector selector;
         private TComparer comparer;
@@ -76,7 +38,7 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Compare(int x, int y)
         {
-            return comparer.Invoke(keys[y], keys[x]);
+            return comparer.Compare(keys[y], keys[x]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
