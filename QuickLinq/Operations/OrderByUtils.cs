@@ -13,34 +13,32 @@ namespace Cathei.QuickLinq.Operations
         public static void PartialQuickSort(
             PooledList<int> indexesToSort, in TComparer comparer, int min, int max)
         {
-            Sort(indexesToSort, comparer, min, max, min, max);
+            if (min < max)
+                Sort(indexesToSort, comparer, min, max, min, max);
         }
 
         private static void Sort(
             PooledList<int> indexesToSort, in TComparer comparer, int left, int right, int min, int max)
         {
-            // sorting is done
-            if (left >= right)
-                return;
+            do
+            {
+                int mid = PartitionHoare(indexesToSort, comparer, left, right);
 
-            // not interested in this segment
-            if (right < min || left > max)
-                return;
+                if (left < mid && mid >= min)
+                    Sort(indexesToSort, comparer, left, mid, min, max);
 
-            int mid = PartitionHoare(indexesToSort, comparer, left, right);
+                left = mid + 1;
 
-            Sort(indexesToSort, comparer, left, mid, min, max);
-            Sort(indexesToSort, comparer, mid + 1, right, min, max);
+            } while (left < right && left <= max);
         }
 
         // Hoare partition scheme
-        // Starting pivot should be Count - 1
         // This implementation is faster when using struct comparer (more comparison and less copy)
         private static int PartitionHoare(
                 in PooledList<int> indexesToSort, TComparer comparer, int left, int right)
         {
             // preventing overflow of the pivot
-            int pivot = left + (right - left) / 2;
+            int pivot = left + ((right - left) >> 1);
             int pivotIndex = indexesToSort[pivot];
 
             int i = left - 1;
@@ -48,29 +46,20 @@ namespace Cathei.QuickLinq.Operations
 
             while (true)
             {
-                int targetIndex;
+                // Move the left index to the right at least once and while the element at
+                // the left index is less than the pivot
+                while (Compare(indexesToSort[++i], pivotIndex, comparer) < 0) { }
 
-                do
-                {
-                    // Move the left index to the right at least once and while the element at
-                    // the left index is less than the pivot
-                    targetIndex = indexesToSort[++i];
-                } while (Compare(targetIndex, pivotIndex, comparer) < 0);
-
-                do
-                {
-                    // Move the right index to the left at least once and while the element at
-                    // the right index is greater than the pivot
-                    targetIndex = indexesToSort[--j];
-                } while (Compare(targetIndex, pivotIndex, comparer) > 0);
+                // Move the right index to the left at least once and while the element at
+                // the right index is greater than the pivot
+                while (Compare(indexesToSort[--j], pivotIndex, comparer) > 0) { }
 
                 // If the indices crossed, return
                 if (i >= j)
                     return j;
 
                 // Swap the elements at the left and right indices
-                indexesToSort[j] = indexesToSort[i];
-                indexesToSort[i] = targetIndex;
+                (indexesToSort[i], indexesToSort[j]) = (indexesToSort[j], indexesToSort[i]);
             }
         }
 

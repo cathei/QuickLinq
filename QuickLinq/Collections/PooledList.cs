@@ -60,9 +60,11 @@ namespace Cathei.QuickLinq.Collections
 
         // used for stack-like approach
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void RemoveLast()
+        internal T Pop()
         {
+            T last = list[^1];
             list.RemoveAt(Count - 1);
+            return last;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
