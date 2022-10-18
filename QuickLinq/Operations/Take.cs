@@ -51,7 +51,7 @@ namespace Cathei.QuickLinq.Operations
         public Take<T, TOperation> GetSliceEnumerator(int skip, int take)
         {
             // trying to boost performance by using source's slicing feature
-            // count parameter is meaningless in this case
+            // the source enumerable is not guaranteed to emit count of take, so we still do the countdown
             return new(source.GetSliceEnumerator(skip, Math.Min(count - skip, take)), take);
         }
     }

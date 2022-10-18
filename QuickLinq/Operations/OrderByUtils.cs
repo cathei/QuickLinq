@@ -11,13 +11,6 @@ namespace Cathei.QuickLinq.Operations
     internal static class OrderByUtils<T, TComparer> where TComparer : IOrderByComparer<T>
     {
         public static void PartialQuickSort(
-            int[] indexesToSort, in TComparer comparer, int min, int max)
-        {
-            if (min < max)
-                Sort(indexesToSort, comparer, min, max, min, max);
-        }
-
-        private static void Sort(
             int[] indexesToSort, in TComparer comparer, int left, int right, int min, int max)
         {
             do
@@ -25,7 +18,7 @@ namespace Cathei.QuickLinq.Operations
                 int mid = PartitionHoare(indexesToSort, comparer, left, right);
 
                 if (left < mid && mid >= min)
-                    Sort(indexesToSort, comparer, left, mid, min, max);
+                    PartialQuickSort(indexesToSort, comparer, left, mid, min, max);
 
                 left = mid + 1;
 

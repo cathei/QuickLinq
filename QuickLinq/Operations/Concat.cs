@@ -22,7 +22,7 @@ namespace Cathei.QuickLinq.Operations
         }
 
         // enumerator constructor
-        private Concat(in TFirst first, in TSecond second, bool firstDone, int takeCount)
+        private Concat(in TFirst first, in TSecond second, bool firstDone = false, int takeCount = -1)
         {
             this.first = first;
             this.second = second;
@@ -34,7 +34,7 @@ namespace Cathei.QuickLinq.Operations
         public Concat<T, TFirst, TSecond> GetEnumerator()
         {
             // second will deferred enumerated
-            return new(first.GetEnumerator(), second, false, int.MaxValue);
+            return new(first.GetEnumerator(), second);
         }
 
         public T Current
@@ -46,19 +46,19 @@ namespace Cathei.QuickLinq.Operations
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
-            if (--takeCount < 0)
-                return false;
-
             if (!firstDone)
             {
                 if (first.MoveNext())
+                {
+                    --takeCount;
                     return true;
+                }
 
                 firstDone = true;
 
                 // deferred execution of second enumerable
-                // compensate takeCount (already decreased) if we can slice second one
-                second = second.CanSlice ? second.GetSliceEnumerator(0, takeCount + 1) : second.GetEnumerator();
+                // takeCount is only positive when initialized as slice enumerator
+                second = takeCount >= 0 ? second.GetSliceEnumerator(0, takeCount) : second.GetEnumerator();
             }
 
             return second.MoveNext();
@@ -86,11 +86,11 @@ namespace Cathei.QuickLinq.Operations
 
                 // first will not be enumerated
                 if (skip >= firstCount)
-                    return new(default, second.GetSliceEnumerator(skip - firstCount, take), true, take);
+                    return new(default, second.GetSliceEnumerator(skip - firstCount, take), firstDone: true);
             }
 
             // second will deferred initialized
-            return new(first.GetSliceEnumerator(skip, take), second, false, take);
+            return new(first.GetSliceEnumerator(skip, take), second, takeCount: take);
         }
     }
 }

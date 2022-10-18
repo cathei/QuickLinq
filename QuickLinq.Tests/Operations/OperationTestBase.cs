@@ -32,7 +32,7 @@ public abstract class OperationTestBase<T, TOperation>
     {
         var enumerable = Build(size);
 
-        if (enumerable.source.CanCount)
+        if (!enumerable.source.CanCount)
             return;
 
         int manualCount = 0;
@@ -94,5 +94,15 @@ public abstract class OperationTestBase<T, TOperation>
         Assert.Throws<NotSupportedException>(() => enumerator.Reset());
     }
 
+    [Test]
+    public void Test_SliceMustBe_SameAsLinq()
+    {
+        var enumerable = Build(20);
+
+        var array1 = enumerable.AsEnumerable().Skip(6).Take(7).ToArray();
+        var array2 = enumerable.Skip(6).Take(7).ToArray();
+
+        CollectionAssert.AreEqual(array1, array2);
+    }
 }
 

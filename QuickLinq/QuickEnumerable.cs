@@ -4,7 +4,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Cathei.QuickLinq.Collections;
 using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq

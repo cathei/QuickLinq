@@ -33,8 +33,8 @@ public abstract class OrderByBenchmarkBase
     {
         get
         {
-            // yield return smallList.ToArray();
-            // yield return mediumList.ToArray();
+            yield return smallList.ToArray();
+            yield return mediumList.ToArray();
             yield return largeList.ToArray();
         }
     }
