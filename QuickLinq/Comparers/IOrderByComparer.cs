@@ -18,7 +18,7 @@ namespace Cathei.QuickLinq.Comparers
         /// <summary>
         /// Create a list of keys
         /// </summary>
-        void Initialize(in PooledList<T> elements);
+        void Initialize(PooledList<T> elements);
 
         /// <summary>
         /// Compare with index of keys

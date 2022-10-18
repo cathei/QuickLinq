@@ -27,9 +27,9 @@ namespace Cathei.QuickLinq.Comparers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(in PooledList<T> elements)
+        public void Initialize(PooledList<T> elements)
         {
-            keys = PooledList<TKey>.Create();
+            keys = new PooledList<TKey>(elements.Count);
 
             for (int i = 0; i < elements.Count; ++i)
                 keys.Add(selector(elements[i]));
@@ -46,7 +46,7 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            keys.Release();
+            keys.Dispose();
         }
     }
 
@@ -70,9 +70,9 @@ namespace Cathei.QuickLinq.Comparers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(in PooledList<T> elements)
+        public void Initialize(PooledList<T> elements)
         {
-            keys = PooledList<TKey>.Create();
+            keys = new PooledList<TKey>(elements.Count);
 
             for (int i = 0; i < elements.Count; ++i)
                 keys.Add(selector.Invoke(elements[i]));
@@ -89,7 +89,7 @@ namespace Cathei.QuickLinq.Comparers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
-            keys.Release();
+            keys.Dispose();
         }
     }
 }

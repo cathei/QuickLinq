@@ -136,7 +136,17 @@ namespace Cathei.QuickLinq
         /// Filter duplicated elements of enumerable.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickEnumerable<T, Distinct<T, TOperation>> Distinct(IEqualityComparer<T>? comparer = null)
+        public QuickEnumerable<T, Distinct<T, IEqualityComparer<T>, TOperation>> Distinct(IEqualityComparer<T>? comparer = null)
+        {
+            return new(new(source, comparer ?? EqualityComparer<T>.Default));
+        }
+
+        /// <summary>
+        /// Filter duplicated elements of enumerable.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public QuickEnumerable<T, Distinct<T, TComparer, TOperation>> Distinct<TComparer>(TComparer comparer)
+            where TComparer : struct, IEqualityComparer<T>
         {
             return new(new(source, comparer));
         }

@@ -1,123 +1,246 @@
-// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
-
-using System;
+﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq.Collections
 {
-    /// <summary>
-    /// Struct represents the borrowed HashSet.
-    /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
-    /// TODO use custom hashset implementation that can use PooledList or ArrayPool
-    /// </summary>
-    public readonly struct PooledSet<T>
+    internal struct PooledSet<T, TComparer> : IDisposable
+        where TComparer : IEqualityComparer<T>
     {
-        private readonly HashSetPool<T>.Item item;
+        private const int Lower31BitMask = 0x7FFFFFFF;
 
-        private PooledSet(in HashSetPool<T>.Item item)
+        private readonly TComparer comparer;
+
+        private int[] buckets;
+        private Slot<T>[] slots;
+        private int size;
+
+        private int count;
+        private int lastIndex;
+
+        internal PooledSet(int capacity, TComparer comparer)
         {
-            this.item = item;
-        }
+            this.comparer = comparer;
 
-        internal static PooledSet<T> Create(IEqualityComparer<T>? comparer)
-        {
-            comparer ??= EqualityComparer<T>.Default;
+            size = HashHelpers.GetPrime(capacity);
+            buckets = SharedArrayPool<int>.Rent(size);
+            Array.Clear(buckets, 0, buckets.Length);
 
-            var item = HashSetPool<T>.Local.Rent();
-            item.comparer.Init(comparer);
-
-            return new(item);
-        }
-
-        /// <summary>
-        /// Be careful to not dispose multiple times.
-        /// Since it is value type there is no real way to prevent.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Release()
-        {
-            if (item.hashSet != null!)
-                HashSetPool<T>.Local.Return(item);
+            slots = SharedArrayPool<Slot<T>>.Rent(size);
+            count = 0;
+            lastIndex = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal bool Add(T current) => item.hashSet.Add(current);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Clear() => item.hashSet.Clear();
-    }
-
-    /// <summary>
-    /// EqualityComparer paired with pooled HashSet.
-    /// This enables inner implementation swap when borrow HashSet.
-    /// </summary>
-    internal class PooledEqualityComparer<T> : IEqualityComparer<T>
-    {
-        private IEqualityComparer<T>? inner;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Init(IEqualityComparer<T> comparer) => this.inner = comparer;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Clear() => inner = null;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(T x, T y) => inner!.Equals(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetHashCode(T obj) => inner!.GetHashCode(obj);
-    }
-
-    /// <summary>
-    /// HashSetPool itself is not thread-safe, we'll have local HashSetPool per thread.
-    /// It's okay to return HashSet to other thread, but TODO consider (sounds like rare case for linq).
-    /// </summary>
-    internal class HashSetPool<T>
-    {
-        [ThreadStatic]
-        private static HashSetPool<T>? threadLocal;
-
-        public static HashSetPool<T> Local
+        private int InternalGetHashCode(T item)
         {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => threadLocal ??= new();
-        }
-
-        public readonly struct Item
-        {
-            public readonly HashSet<T> hashSet;
-            public readonly PooledEqualityComparer<T> comparer;
-
-            public Item(HashSet<T> hashSet, PooledEqualityComparer<T> comparer)
+            if (item == null)
             {
-                this.hashSet = hashSet;
-                this.comparer = comparer;
+                return 0;
+            }
+            return comparer.GetHashCode(item) & Lower31BitMask;
+        }
+
+        private void IncreaseCapacity()
+        {
+            int newSize = HashHelpers.ExpandPrime(count);
+            if (newSize <= count)
+            {
+                throw new InvalidOperationException("Capacity overflow");
+            }
+
+            // Able to increase capacity; copy elements to larger array and rehash
+            SetCapacity(newSize);
+        }
+
+        private void SetCapacity(int newSize)
+        {
+
+            int[] newBuckets;
+            Slot<T>[] newSlots;
+            bool replaceArrays;
+
+            // Because ArrayPool might have given us larger arrays than we asked for, see if we can
+            // use the existing capacity without actually resizing.
+            if (buckets?.Length >= newSize && slots?.Length >= newSize)
+            {
+                Array.Clear(buckets, 0, buckets.Length);
+                Array.Clear(slots, size, newSize - size);
+                newBuckets = buckets;
+                newSlots = slots;
+                replaceArrays = false;
+            }
+            else
+            {
+                newSlots = SharedArrayPool<Slot<T>>.Rent(newSize);
+                newBuckets = SharedArrayPool<int>.Rent(newSize);
+
+                Array.Clear(newBuckets, 0, newBuckets.Length);
+
+                if (slots != null)
+                {
+                    Array.Copy(slots, 0, newSlots, 0, lastIndex);
+                }
+                replaceArrays = true;
+            }
+
+            for (int i = 0; i < lastIndex; i++)
+            {
+                ref var newSlot = ref newSlots[i];
+                int bucket = newSlot.hashCode % newSize;
+                newSlot.next = newBuckets[bucket] - 1;
+                newBuckets[bucket] = i + 1;
+            }
+
+            if (replaceArrays)
+            {
+                ReturnArrays();
+                slots = newSlots;
+                buckets = newBuckets;
+            }
+
+            size = newSize;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReturnArrays()
+        {
+            if (slots.Length > 0)
+            {
+                try
+                {
+                    SharedArrayPool<Slot<T>>.Return(slots, true);
+                }
+                catch (ArgumentException)
+                {
+                    // oh well, the array pool didn't like our array
+                }
+            }
+
+            if (buckets.Length > 0)
+            {
+                try
+                {
+                    SharedArrayPool<int>.Return(buckets, false);
+                }
+                catch (ArgumentException)
+                {
+                    // shucks
+                }
+            }
+
+            slots = Array.Empty<Slot<T>>();
+            buckets = Array.Empty<int>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool AddIfNotPresent(T value)
+        {
+            int hashCode = InternalGetHashCode(value);
+            int bucket = hashCode % size;
+            int collisionCount = 0;
+            Slot<T>[] tmpSlots = slots;
+            for (int i = buckets[bucket] - 1; i >= 0; )
+            {
+                ref var slot = ref tmpSlots[i];
+                if (slot.hashCode == hashCode && comparer.Equals(slot.value, value))
+                    return false;
+
+                if (collisionCount >= size)
+                {
+                    // The chain of entries forms a loop, which means a concurrent update has happened.
+                    throw new InvalidOperationException("Concurrent operations are not supported.");
+                }
+                collisionCount++;
+                i = slot.next;
+            }
+
+            int index;
+            if (lastIndex == size)
+            {
+                IncreaseCapacity();
+                // this will change during resize
+                tmpSlots = slots;
+                bucket = hashCode % size;
+            }
+
+            index = lastIndex;
+            lastIndex++;
+
+            ref var slot1 = ref tmpSlots[index];
+            slot1.hashCode = hashCode;
+            slot1.value = value;
+            slot1.next = buckets[bucket] - 1;
+            buckets[bucket] = index + 1;
+            count++;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal bool Remove(T item)
+        {
+            int hashCode = InternalGetHashCode(item);
+            int bucket = hashCode % size;
+            int last = -1;
+            int collisionCount = 0;
+            Slot<T>[] tmpSlots = slots;
+            for (int i = buckets[bucket] - 1; i >= 0; last = i, i = tmpSlots[i].next)
+            {
+                ref var tmpSlot = ref tmpSlots[i];
+                if (tmpSlot.hashCode == hashCode && comparer.Equals(tmpSlot.value, item))
+                {
+                    if (last < 0)
+                    {
+                        buckets[bucket] = tmpSlot.next + 1;
+                    }
+                    else
+                    {
+                        ref var lastSlot = ref tmpSlots[last];
+                        lastSlot.next = tmpSlot.next;
+                    }
+
+                    tmpSlot.hashCode = -1;
+
+                    count--;
+                    if (count == 0)
+                    {
+                        lastIndex = 0;
+                    }
+
+                    return true;
+                }
+
+                if (collisionCount >= size)
+                {
+                    throw new InvalidOperationException("Concurrent operations are not supported.");
+                }
+                collisionCount++;
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void Clear()
+        {
+            if (lastIndex > 0)
+            {
+                // clear the elements so that the gc can reclaim the references.
+                // clear only up to _lastIndex for _slots
+                Array.Clear(slots, 0, lastIndex);
+                Array.Clear(buckets, 0, buckets.Length);
+                lastIndex = 0;
+                count = 0;
             }
         }
 
-        private readonly Stack<Item> pool = new();
-
-        public Item Rent()
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
         {
-            if (pool.Count > 0)
-                return pool.Pop();
-
-            var comparer = new PooledEqualityComparer<T>();
-            var hashSet = new HashSet<T>(comparer);
-
-            return new Item(hashSet, comparer);
-        }
-
-        public void Return(in Item item)
-        {
-            // this will clear hash set and comparer items for GC
-            item.hashSet.Clear();
-            item.comparer.Clear();
-
-            pool.Push(item);
+            ReturnArrays();
+            size = 0;
+            lastIndex = 0;
+            count = 0;
         }
     }
 }

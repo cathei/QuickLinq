@@ -25,7 +25,7 @@ namespace Cathei.QuickLinq.Comparers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(in PooledList<T> elements)
+        public void Initialize(PooledList<T> elements)
         {
             keys = elements;
         }
@@ -62,7 +62,7 @@ namespace Cathei.QuickLinq.Comparers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Initialize(in PooledList<T> elements)
+        public void Initialize(PooledList<T> elements)
         {
             keys = elements;
         }

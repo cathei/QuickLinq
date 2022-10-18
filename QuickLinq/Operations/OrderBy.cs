@@ -19,12 +19,12 @@ namespace Cathei.QuickLinq.Operations
         /// <summary>
         /// Readonly list of indexes.
         /// </summary>
-        private readonly PooledList<int> indexes;
+        private PooledList<int> indexes;
 
         /// <summary>
         /// Readonly list of elements.
         /// </summary>
-        private readonly PooledList<T> elements;
+        private PooledList<T> elements;
 
         private int indexOfIndex;
 
@@ -37,7 +37,7 @@ namespace Cathei.QuickLinq.Operations
 
         // enumerator constructor
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
-        private OrderBy(in TOperation source, PooledList<int> indexes, PooledList<T> elements, int startIndex) : this()
+        private OrderBy(in TOperation source, in PooledList<int> indexes, in PooledList<T> elements, int startIndex) : this()
         {
             this.source = source;
             this.indexes = indexes;
@@ -64,8 +64,8 @@ namespace Cathei.QuickLinq.Operations
         public void Dispose()
         {
             source.Dispose();
-            indexes.Release();
-            elements.Release();
+            indexes.Dispose();
+            elements.Dispose();
         }
 
         public bool CanCount => source.CanCount;
@@ -79,25 +79,26 @@ namespace Cathei.QuickLinq.Operations
             var enumerator = source.GetEnumerator();
 
             // prepare temporary buffers
-            var indexBuffer = PooledList<int>.Create();
-            var elementBuffer = PooledList<T>.Create();
-
-            // copy first to not modify member variable
-            var comparerCopy = comparer;
+            var elementBuffer = new PooledList<T>(source.CanCount ? source.MaxCount : 0);
 
             // load all elements
             while (enumerator.MoveNext())
                 elementBuffer.Add(enumerator.Current);
 
+            var indexBuffer = new PooledList<int>(elementBuffer.Count);
+
             // initialize all indexes
             for (int i = 0; i < elementBuffer.Count; ++i)
                 indexBuffer.Add(i);
+
+            // copy first to not modify member variable
+            var comparerCopy = comparer;
 
             // initialize copied comparer with keys
             comparerCopy.Initialize(elementBuffer);
 
             OrderByUtils<T, TComparer>.PartialQuickSort(
-                indexBuffer, comparerCopy, skip, Math.Min(skip + take, indexBuffer.Count) - 1);
+                indexBuffer.Array, comparerCopy, skip, Math.Min(skip + take, indexBuffer.Count) - 1);
 
             comparerCopy.Dispose();
 

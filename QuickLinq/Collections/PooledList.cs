@@ -1,111 +1,89 @@
-// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
-
-using System;
-using System.Collections.Generic;
+﻿using System;
+using System.Buffers;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq.Collections
 {
-    /// <summary>
-    /// Struct that represents borrowed List.
-    /// The API will remain internal, since it is not possible to ensure the reference is not retained after Disposing.
-    /// </summary>
-    public readonly struct PooledList<T>
+    public struct PooledList<T> : IDisposable
     {
-        private readonly List<T> list;
+        private T[] array;
+        private int count;
 
-        private PooledList(List<T> list)
+        internal PooledList(int capacity)
         {
-            this.list = list;
+            array = capacity > 0 ? SharedArrayPool<T>.Rent(capacity) : System.Array.Empty<T>();
+            count = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static PooledList<T> Create()
+        private void IncreaseCapacity()
         {
-            return new(ListPool<T>.Local.Rent());
+            var newItems = SharedArrayPool<T>.Rent(count + 1);
+
+            if (count > 0)
+                System.Array.Copy(array, newItems, count);
+
+            ReturnArray();
+            array = newItems;
         }
 
-        /// <summary>
-        /// Be careful to not dispose multiple times.
-        /// Since it is value type there is no real way to prevent.
-        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Release()
+        private void ReturnArray()
         {
-            if (list != null)
-                ListPool<T>.Local.Return(list);
+            if (array.Length == 0)
+                return;
+
+            try
+            {
+                // Clear the elements so that the gc can reclaim the references.
+                SharedArrayPool<T>.Return(array, true);
+            }
+            catch (ArgumentException)
+            {
+                // oh well, the array pool didn't like our array
+            }
+
+            array = System.Array.Empty<T>();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal void Add(T item)
+        {
+            if (count >= array.Length)
+                IncreaseCapacity();
+
+            array[count++] = item;
         }
 
         internal int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => list.Count;
+            get => count;
         }
+
+        internal T[] Array => array;
 
         internal T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => list[index];
+            get => array[index];
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => list[index] = value;
+            set => array[index] = value;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Add(T element)
+        public void Dispose()
         {
-            list.Add(element);
-        }
-
-        // used for stack-like approach
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal T Pop()
-        {
-            T last = list[^1];
-            list.RemoveAt(Count - 1);
-            return last;
+            ReturnArray();
+            count = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void Clear()
+        internal T[] ToArray()
         {
-            list.Clear();
-        }
-    }
-
-    /// <summary>
-    /// ListPool itself is not thread-safe, we'll have local ListPool per thread.
-    /// It's okay to return List to other thread, but TODO consider (sounds like rare case for linq).
-    /// </summary>
-    internal class ListPool<T>
-    {
-        [ThreadStatic]
-        private static ListPool<T>? threadLocal;
-
-        public static ListPool<T> Local
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => threadLocal ??= new();
-        }
-
-        private readonly Stack<List<T>> pool = new();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public List<T> Rent()
-        {
-            if (pool.Count > 0)
-                return pool.Pop();
-            return new();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Return(List<T> list)
-        {
-            // this will clear list items for GC
-            list.Clear();
-
-            pool.Push(list);
+            var result = new T[count];
+            System.Array.Copy(array, result, count);
+            return result;
         }
     }
 }

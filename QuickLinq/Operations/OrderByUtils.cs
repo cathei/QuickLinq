@@ -11,14 +11,14 @@ namespace Cathei.QuickLinq.Operations
     internal static class OrderByUtils<T, TComparer> where TComparer : IOrderByComparer<T>
     {
         public static void PartialQuickSort(
-            PooledList<int> indexesToSort, in TComparer comparer, int min, int max)
+            int[] indexesToSort, in TComparer comparer, int min, int max)
         {
             if (min < max)
                 Sort(indexesToSort, comparer, min, max, min, max);
         }
 
         private static void Sort(
-            PooledList<int> indexesToSort, in TComparer comparer, int left, int right, int min, int max)
+            int[] indexesToSort, in TComparer comparer, int left, int right, int min, int max)
         {
             do
             {
@@ -34,8 +34,7 @@ namespace Cathei.QuickLinq.Operations
 
         // Hoare partition scheme
         // This implementation is faster when using struct comparer (more comparison and less copy)
-        private static int PartitionHoare(
-                in PooledList<int> indexesToSort, TComparer comparer, int left, int right)
+        private static int PartitionHoare(int[] indexesToSort, TComparer comparer, int left, int right)
         {
             // preventing overflow of the pivot
             int pivot = left + ((right - left) >> 1);
@@ -64,33 +63,6 @@ namespace Cathei.QuickLinq.Operations
         }
 
 
-
-
-        // // Optimal incremental sorting
-        // [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        // public static bool IncrementalSorting(
-        //         in PooledList<int> indexesToSort, in PooledList<int> sortingStack, in TComparer comparer, int indexOfIndex)
-        // {
-        //     // passed last element
-        //     if (indexOfIndex >= indexesToSort.Count)
-        //         return false;
-        //
-        //     while (true)
-        //     {
-        //         int top = sortingStack[^1];
-        //
-        //         if (indexOfIndex == top)
-        //         {
-        //             sortingStack.RemoveLast();
-        //             return true;
-        //         }
-        //
-        //         int pivot = PartitionHoare(indexesToSort, comparer, indexOfIndex, top);
-        //         // int pivot = PartitionLomuto(indexesToSort, comparer, indexOfIndex, top - 1);
-        //         sortingStack.Add(pivot);
-        //     }
-        // }
-        //
         // // Lomuto partition
         // // Starting pivot should be Count
         // // This implementation is faster when using regular comparer (more copy and less comparison)

@@ -6,29 +6,34 @@ using Cathei.QuickLinq.Collections;
 
 namespace Cathei.QuickLinq.Operations
 {
-    public struct Distinct<T, TOperation> : IQuickOperation<T, Distinct<T, TOperation>>
+    public struct Distinct<T, TComparer, TOperation> : IQuickOperation<T, Distinct<T, TComparer, TOperation>>
+        where TComparer : IEqualityComparer<T>
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         private TOperation source;
-        private readonly IEqualityComparer<T>? comparer;
-        private readonly PooledSet<T> pooledSet;
+        private TComparer? comparer;
+        private PooledSet<T, TComparer> pooledSet;
 
         // enumerable constructor
-        internal Distinct(in TOperation source, IEqualityComparer<T>? comparer) : this()
+        internal Distinct(in TOperation source, TComparer comparer) : this()
         {
             this.source = source;
             this.comparer = comparer;
         }
 
         // enumerator constructor
-        private Distinct(in TOperation source, in PooledSet<T> pooledSet) : this()
+        private Distinct(in TOperation source, in PooledSet<T, TComparer> pooledSet) : this()
         {
             this.source = source;
             this.pooledSet = pooledSet;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Distinct<T, TOperation> GetEnumerator() => new(source.GetEnumerator(), PooledSet<T>.Create(comparer));
+        public Distinct<T, TComparer, TOperation> GetEnumerator()
+        {
+            return new(source.GetEnumerator(), new PooledSet<T, TComparer>(
+                source.CanCount ? source.MaxCount : 0, comparer!));
+        }
 
         public T Current
         {
@@ -44,7 +49,7 @@ namespace Cathei.QuickLinq.Operations
                 if (!source.MoveNext())
                     return false;
 
-                if (pooledSet.Add(source.Current))
+                if (pooledSet.AddIfNotPresent(source.Current))
                     return true;
             }
         }
@@ -53,7 +58,7 @@ namespace Cathei.QuickLinq.Operations
         public void Dispose()
         {
             source.Dispose();
-            pooledSet.Release();
+            pooledSet.Dispose();
         }
 
         public bool CanCount => false;
