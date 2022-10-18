@@ -13,22 +13,13 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T First()
         {
-            if (source.CanSlice)
-            {
-                if (source.SliceMax == 0)
-                    throw new InvalidOperationException();
+            using var enumerator = source.CanSlice ?
+                source.GetSliceEnumerator(0, 1) : GetEnumerator();
 
-                using var slice = source.GetSliceEnumerator(0, 1);
-
-                if (!slice.MoveNext())
-                    throw new InvalidOperationException("Collection was modified");
-
-                return slice.Current;
-            }
-
-            using var enumerator = GetEnumerator();
+            // there are no elements
             if (enumerator.MoveNext())
                 return enumerator.Current;
+
             throw new InvalidOperationException();
         }
 
@@ -38,20 +29,9 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? FirstOrDefault()
         {
-            if (source.CanSlice)
-            {
-                if (source.SliceMax == 0)
-                    throw new InvalidOperationException();
+            using var enumerator = source.CanSlice ?
+                source.GetSliceEnumerator(0, 1) : GetEnumerator();
 
-                using var slice = source.GetSliceEnumerator(0, 1);
-
-                if (!slice.MoveNext())
-                    throw new InvalidOperationException("Collection was modified");
-
-                return slice.Current;
-            }
-
-            using var enumerator = GetEnumerator();
             return enumerator.MoveNext() ? enumerator.Current : default;
         }
 
@@ -61,24 +41,16 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Single()
         {
-            if (source.CanSlice)
-            {
-                if (source.SliceMax != 1)
-                    throw new InvalidOperationException();
+            using var enumerator = source.CanSlice ?
+                source.GetSliceEnumerator(0, 2) : GetEnumerator();
 
-                using var slice = source.GetSliceEnumerator(0, 1);
-
-                if (!slice.MoveNext())
-                    throw new InvalidOperationException("Collection was modified");
-
-                return slice.Current;
-            }
-
-            using var enumerator = GetEnumerator();
+            // there are no elements
             if (!enumerator.MoveNext())
                 throw new InvalidOperationException();
 
             T singleValue = enumerator.Current;
+
+            // there are multiple elements
             if (enumerator.MoveNext())
                 throw new InvalidOperationException();
 

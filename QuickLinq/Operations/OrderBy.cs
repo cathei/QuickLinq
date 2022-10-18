@@ -1,5 +1,6 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,17 +16,15 @@ namespace Cathei.QuickLinq.Operations
         internal TOperation source;
         internal TComparer comparer;
 
-        private readonly PooledList<int> indexesToSort;
+        /// <summary>
+        /// Readonly list of indexes.
+        /// </summary>
+        private readonly PooledList<int> indexes;
 
         /// <summary>
         /// Readonly list of elements.
         /// </summary>
         private readonly PooledList<T> elements;
-
-        /// <summary>
-        /// Stack used instead of recursive QuickSort.
-        /// </summary>
-        private readonly PooledList<int> sortingStack;
 
         private int indexOfIndex;
 
@@ -38,68 +37,35 @@ namespace Cathei.QuickLinq.Operations
 
         // enumerator constructor
         // the elements of source already saved in pooled list, but we should dispose it after enumeration
-        private OrderBy(in TOperation source, in TComparer comparer,
-            in PooledList<int> indexesToSort, in PooledList<T> elements, in PooledList<int> sortingStack) : this()
+        private OrderBy(in TOperation source, PooledList<int> indexes, PooledList<T> elements, int startIndex) : this()
         {
             this.source = source;
-            this.comparer = comparer;
-
-            this.indexesToSort = indexesToSort;
+            this.indexes = indexes;
             this.elements = elements;
-            this.sortingStack = sortingStack;
 
-            // initialize copied comparer
-            this.comparer.Initialize(elements);
-
-            indexOfIndex = -1;
-
-            for (int i = 0; i < elements.Count; ++i)
-                indexesToSort.Add(i);
-
-             // initial left and right
-            sortingStack.Add(elements.Count - 1);
+            indexOfIndex = startIndex - 1;
         }
 
-        public OrderBy<T, TComparer, TOperation> GetEnumerator()
-        {
-            var enumerator = source.GetEnumerator();
-
-            var indexBuffer = PooledList<int>.Create();
-            var elementBuffer = PooledList<T>.Create();
-            var pivotBuffer = PooledList<int>.Create();
-
-            while (enumerator.MoveNext())
-                elementBuffer.Add(enumerator.Current);
-
-            return new(enumerator, comparer, indexBuffer, elementBuffer, pivotBuffer);
-        }
+        public OrderBy<T, TComparer, TOperation> GetEnumerator() => GetSliceEnumerator(0, int.MaxValue);
 
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => elements[indexesToSort[indexOfIndex]];
+            get => elements[indexes[indexOfIndex]];
         }
 
         /// <summary>
         /// Partial quicksort as enumeration goes.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext()
-        {
-            ++indexOfIndex;
-
-            return OrderByUtils<T, TComparer>.IncrementalSorting(
-                indexesToSort, sortingStack, comparer, indexOfIndex);
-        }
+        public bool MoveNext() => ++indexOfIndex < indexes.Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             source.Dispose();
-            indexesToSort.Release();
+            indexes.Release();
             elements.Release();
-            sortingStack.Release();
-            comparer.Dispose();
         }
 
         public bool CanCount => source.CanCount;
@@ -112,14 +78,30 @@ namespace Cathei.QuickLinq.Operations
         {
             var enumerator = source.GetEnumerator();
 
+            // prepare temporary buffers
             var indexBuffer = PooledList<int>.Create();
             var elementBuffer = PooledList<T>.Create();
-            var pivotBuffer = PooledList<int>.Create();
 
+            // copy first to not modify member variable
+            var comparerCopy = comparer;
+
+            // load all elements
             while (enumerator.MoveNext())
                 elementBuffer.Add(enumerator.Current);
 
-            return new(enumerator, comparer, indexBuffer, elementBuffer, pivotBuffer);
+            // initialize all indexes
+            for (int i = 0; i < elementBuffer.Count; ++i)
+                indexBuffer.Add(i);
+
+            // initialize copied comparer with keys
+            comparerCopy.Initialize(elementBuffer);
+
+            OrderByUtils<T, TComparer>.PartialQuickSort(
+                indexBuffer, comparerCopy, skip, Math.Min(skip + take, indexBuffer.Count) - 1);
+
+            comparerCopy.Dispose();
+
+            return new(enumerator, indexBuffer, elementBuffer, skip);
         }
     }
 }

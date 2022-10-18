@@ -25,6 +25,24 @@ public abstract class OperationTestBase<T, TOperation>
         Assert.AreEqual(size, count);
     }
 
+    [TestCase(0)]
+    [TestCase(5)]
+    [TestCase(10)]
+    public void Test_CountableMustBe_SameAsManualCount(int size)
+    {
+        var enumerable = Build(size);
+
+        if (enumerable.source.CanCount)
+            return;
+
+        int manualCount = 0;
+
+        foreach (var _ in enumerable)
+            ++manualCount;
+
+        Assert.AreEqual(manualCount, enumerable.source.MaxCount);
+    }
+
     [TestCase(2)]
     [TestCase(8)]
     [TestCase(12)]

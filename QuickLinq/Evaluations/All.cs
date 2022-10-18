@@ -11,7 +11,7 @@ namespace Cathei.QuickLinq
         /// Checks if all elements in enumerable satisfies given condition.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool All<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
+        public bool All<TFunc>(TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
             using var enumerator = GetEnumerator();
 

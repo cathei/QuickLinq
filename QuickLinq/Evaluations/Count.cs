@@ -13,8 +13,8 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count()
         {
-            if (source.CanSlice)
-                return source.SliceMax;
+            if (source.CanCount)
+                return source.MaxCount;
 
             using var enumerator = GetEnumerator();
             int count = 0;
@@ -28,7 +28,7 @@ namespace Cathei.QuickLinq
         /// Counts the number of elements in enumerable satisfying given condition.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Count<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
+        public int Count<TFunc>(TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
             using var enumerator = GetEnumerator();
             int count = 0;

@@ -42,6 +42,8 @@ namespace Cathei.QuickLinq.Operations
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
 
+        public bool CanCount => false;
+
         public bool CanSlice => false;
     }
 }

@@ -1,6 +1,7 @@
 ﻿// QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq
@@ -13,10 +14,12 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Any()
         {
-            if (source.CanSlice)
-                return source.SliceMax > 0;
+            if (source.CanCount)
+                return source.MaxCount > 0;
 
-            using var enumerator = GetEnumerator();
+            using var enumerator = source.CanSlice ?
+                source.GetSliceEnumerator(0, 1) : GetEnumerator();
+
             return enumerator.MoveNext();
         }
 
@@ -24,7 +27,7 @@ namespace Cathei.QuickLinq
         /// Checks if any element in enumerable satisfies given condition.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Any<TFunc>(in TFunc predicate) where TFunc : IQuickFunction<T, bool>
+        public bool Any<TFunc>(TFunc predicate) where TFunc : IQuickFunction<T, bool>
         {
             using var enumerator = GetEnumerator();
 

@@ -20,15 +20,16 @@ namespace Cathei.QuickLinq.Quick
         }
 
         // enumerator constructor
-        private QuickenList(IList<T> list, int index, int max)
+        private QuickenList(IList<T> list, int start, int max)
         {
             this.list = list;
-            this.index = index;
             this.max = max;
+
+            index = start - 1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickenList<T> GetEnumerator() => new(list, -1, list.Count);
+        public QuickenList<T> GetEnumerator() => new(list, 0, list.Count);
 
         public T Current
         {
@@ -50,6 +51,6 @@ namespace Cathei.QuickLinq.Quick
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public QuickenList<T> GetSliceEnumerator(int skip, int take) =>
-            new(list, skip - 1, Math.Min(list.Count, skip + take));
+            new(list, skip, Math.Min(list.Count, skip + take));
     }
 }

@@ -13,12 +13,14 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Last()
         {
-            if (source.CanSlice)
+            if (source.CanCount)
             {
-                if (source.SliceMax == 0)
+                int count = source.MaxCount;
+
+                if (count == 0)
                     throw new InvalidOperationException();
 
-                using var slice = source.GetSliceEnumerator(source.SliceMax - 1, 1);
+                using var slice = source.GetSliceEnumerator(count - 1, 1);
 
                 if (!slice.MoveNext())
                     throw new InvalidOperationException("Collection was modified");
@@ -43,12 +45,14 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? LastOrDefault()
         {
-            if (source.CanSlice)
+            if (source.CanCount)
             {
-                if (source.SliceMax == 0)
+                int count = source.MaxCount;
+
+                if (count == 0)
                     return default;
 
-                using var slice = source.GetSliceEnumerator(source.SliceMax - 1, 1);
+                using var slice = source.GetSliceEnumerator(count - 1, 1);
 
                 if (!slice.MoveNext())
                     throw new InvalidOperationException("Collection was modified");
