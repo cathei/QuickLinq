@@ -1,5 +1,6 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -8,16 +9,26 @@ namespace Cathei.QuickLinq.Quick
     public struct QuickenList<T> : IQuickOperation<T, QuickenList<T>>
     {
         private readonly IList<T> list;
+        private readonly int max;
+
         private int index;
 
-        internal QuickenList(in IList<T> list)
+        // enumerable constructor
+        internal QuickenList(IList<T> list) : this()
         {
             this.list = list;
-            index = -1;
+        }
+
+        // enumerator constructor
+        private QuickenList(IList<T> list, int index, int max)
+        {
+            this.list = list;
+            this.index = index;
+            this.max = max;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public QuickenList<T> GetEnumerator() => new(list);
+        public QuickenList<T> GetEnumerator() => new(list, -1, list.Count);
 
         public T Current
         {
@@ -26,18 +37,19 @@ namespace Cathei.QuickLinq.Quick
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext() => ++index < list.Count;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => index = -1;
+        public bool MoveNext() => ++index < max;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }
 
-        public bool IsCollection => true;
+        public bool CanCount => true;
 
-        public int Count => list.Count;
+        public int MaxCount => list.Count;
 
-        public T Get(int i) => list[i];
+        public bool CanSlice => true;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public QuickenList<T> GetSliceEnumerator(int skip, int take) =>
+            new(list, skip - 1, Math.Min(list.Count, skip + take));
     }
 }

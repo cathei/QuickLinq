@@ -8,10 +8,10 @@ namespace Cathei.QuickLinq
     public partial struct QuickEnumerable<T, TOperation>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Sum<TFunc>(TFunc selector) where TFunc : IQuickFunction<T, int>
+        public int Sum<TFunc>(TFunc selector, int initialValue = default) where TFunc : IQuickFunction<T, int>
         {
             using var enumerator = GetEnumerator();
-            int result = 0;
+            int result = initialValue;
 
             while (enumerator.MoveNext())
                 result += selector.Invoke(enumerator.Current);
@@ -19,10 +19,10 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Sum(Func<T, int> selector)
+        public int Sum(Func<T, int> selector, int initialValue = default)
         {
             using var enumerator = GetEnumerator();
-            int result = 0;
+            int result = initialValue;
 
             while (enumerator.MoveNext())
                 result += selector.Invoke(enumerator.Current);
@@ -33,11 +33,11 @@ namespace Cathei.QuickLinq
     public partial class QuickEnumerableExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int Sum<TOperation>(this QuickEnumerable<int, TOperation> source)
+        public static int Sum<TOperation>(this QuickEnumerable<int, TOperation> source, int initialValue = default)
             where TOperation : struct, IQuickOperation<int, TOperation>
         {
             using var enumerator = source.GetEnumerator();
-            int result = 0;
+            int result = initialValue;
 
             while (enumerator.MoveNext())
                 result += enumerator.Current;
@@ -45,11 +45,11 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sum<TOperation>(this QuickEnumerable<float, TOperation> source)
+        public static float Sum<TOperation>(this QuickEnumerable<float, TOperation> source, float initialValue = default)
             where TOperation : struct, IQuickOperation<float, TOperation>
         {
             using var enumerator = source.GetEnumerator();
-            float result = 0;
+            float result = initialValue;
 
             while (enumerator.MoveNext())
                 result += enumerator.Current;
@@ -57,11 +57,11 @@ namespace Cathei.QuickLinq
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double Sum<TOperation>(this QuickEnumerable<double, TOperation> source)
+        public static double Sum<TOperation>(this QuickEnumerable<double, TOperation> source, double initialValue = default)
             where TOperation : struct, IQuickOperation<double, TOperation>
         {
             using var enumerator = source.GetEnumerator();
-            double result = 0;
+            double result = initialValue;
 
             while (enumerator.MoveNext())
                 result += enumerator.Current;

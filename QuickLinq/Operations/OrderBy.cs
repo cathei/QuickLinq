@@ -93,16 +93,6 @@ namespace Cathei.QuickLinq.Operations
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset()
-        {
-            indexOfIndex = -1;
-
-            // initial left and right
-            sortingStack.Clear();
-            sortingStack.Add(elements.Count - 1);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             source.Dispose();
@@ -112,6 +102,24 @@ namespace Cathei.QuickLinq.Operations
             comparer.Dispose();
         }
 
-        public bool IsCollection => false;
+        public bool CanCount => source.CanCount;
+
+        public int MaxCount => source.MaxCount;
+
+        public bool CanSlice => true;
+
+        public OrderBy<T, TComparer, TOperation> GetSliceEnumerator(int skip, int take)
+        {
+            var enumerator = source.GetEnumerator();
+
+            var indexBuffer = PooledList<int>.Create();
+            var elementBuffer = PooledList<T>.Create();
+            var pivotBuffer = PooledList<int>.Create();
+
+            while (enumerator.MoveNext())
+                elementBuffer.Add(enumerator.Current);
+
+            return new(enumerator, comparer, indexBuffer, elementBuffer, pivotBuffer);
+        }
     }
 }

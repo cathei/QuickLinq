@@ -50,19 +50,14 @@ namespace Cathei.QuickLinq.Operations
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset()
-        {
-            source.Reset();
-            pooledSet.Clear();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             source.Dispose();
             pooledSet.Release();
         }
 
-        public bool IsCollection => false;
+        public bool CanCount => false;
+
+        public bool CanSlice => false;
     }
 }

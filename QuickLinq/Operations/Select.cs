@@ -18,7 +18,8 @@ namespace Cathei.QuickLinq.Operations
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Select<TIn, TOut, TOperation, TFunc> GetEnumerator() => new(source.GetEnumerator(), selector);
+        public Select<TIn, TOut, TOperation, TFunc> GetEnumerator()
+            => new(source.GetEnumerator(), selector);
 
         public TOut Current
         {
@@ -30,15 +31,16 @@ namespace Cathei.QuickLinq.Operations
         public bool MoveNext() => source.MoveNext();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => source.Reset();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
 
-        public bool IsCollection => source.IsCollection;
+        public bool CanCount => source.CanCount;
 
-        public int Count => source.Count;
+        public int MaxCount => source.MaxCount;
 
-        public TOut Get(int i) => selector.Invoke(source.Get(i));
+        public bool CanSlice => source.CanSlice;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Select<TIn, TOut, TOperation, TFunc> GetSliceEnumerator(int skip, int take)
+            => new(source.GetSliceEnumerator(skip, take), selector);
     }
 }

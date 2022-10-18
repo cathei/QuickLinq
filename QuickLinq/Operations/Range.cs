@@ -1,5 +1,6 @@
 // QuickLinq, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Cathei.QuickLinq.Operations
@@ -32,15 +33,15 @@ namespace Cathei.QuickLinq.Operations
         public bool MoveNext() => ++value < count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => value = -1;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }
 
-        public bool IsCollection => true;
+        public bool CanCount => true;
 
-        public int Count => count;
+        public int MaxCount => count;
 
-        public int Get(int i) => start + i;
+        public bool CanSlice => true;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Range GetSliceEnumerator(int skip, int take) => new(start + skip, Math.Min(count - skip, take));
     }
 }

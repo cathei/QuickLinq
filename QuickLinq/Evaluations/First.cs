@@ -13,11 +13,17 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T First()
         {
-            if (source.IsCollection)
+            if (source.CanSlice)
             {
-                if (source.Count == 0)
+                if (source.SliceMax == 0)
                     throw new InvalidOperationException();
-                return source.Get(0);
+
+                using var slice = source.GetSliceEnumerator(0, 1);
+
+                if (!slice.MoveNext())
+                    throw new InvalidOperationException("Collection was modified");
+
+                return slice.Current;
             }
 
             using var enumerator = GetEnumerator();
@@ -32,11 +38,17 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T? FirstOrDefault()
         {
-            if (source.IsCollection)
+            if (source.CanSlice)
             {
-                if (source.Count == 0)
-                    return default;
-                return source.Get(0);
+                if (source.SliceMax == 0)
+                    throw new InvalidOperationException();
+
+                using var slice = source.GetSliceEnumerator(0, 1);
+
+                if (!slice.MoveNext())
+                    throw new InvalidOperationException("Collection was modified");
+
+                return slice.Current;
             }
 
             using var enumerator = GetEnumerator();
@@ -49,11 +61,17 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Single()
         {
-            if (source.IsCollection)
+            if (source.CanSlice)
             {
-                if (source.Count != 1)
+                if (source.SliceMax != 1)
                     throw new InvalidOperationException();
-                return source.Get(0);
+
+                using var slice = source.GetSliceEnumerator(0, 1);
+
+                if (!slice.MoveNext())
+                    throw new InvalidOperationException("Collection was modified");
+
+                return slice.Current;
             }
 
             using var enumerator = GetEnumerator();

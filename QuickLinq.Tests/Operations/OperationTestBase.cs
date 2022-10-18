@@ -1,5 +1,6 @@
 // QuickLinq.Tests, Maxwell Keonwoo Kang <code.athei@gmail.com>, 2022
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -67,22 +68,12 @@ public abstract class OperationTestBase<T, TOperation>
     }
 
     [Test]
-    public void Test_ResettingEnumeration_MustBeSame()
+    public void Test_ResettingEnumeration_WillNotBeSupported()
     {
         var enumerable = Build(5);
         using var enumerator = enumerable.GetEnumerator();
 
-        List<T> list1 = new(), list2 = new();
-
-        while (enumerator.MoveNext())
-            list1.Add(enumerator.Current);
-
-        enumerator.Reset();
-
-        while (enumerator.MoveNext())
-            list2.Add(enumerator.Current);
-
-        CollectionAssert.AreEqual(list1, list2);
+        Assert.Throws<NotSupportedException>(() => enumerator.Reset());
     }
 
 }

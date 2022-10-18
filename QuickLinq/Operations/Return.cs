@@ -6,17 +6,24 @@ namespace Cathei.QuickLinq.Operations
 {
     public struct Return<T> : IQuickOperation<T, Return<T>>
     {
-        internal readonly T element;
+        private readonly T element;
         private bool done;
 
-        internal Return(in T element)
+        // enumerable constructor
+        internal Return(in T element) : this()
         {
             this.element = element;
-            done = false;
+        }
+
+        // enumerator constructor
+        private Return(in T element, bool done)
+        {
+            this.element = element;
+            this.done = done;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Return<T> GetEnumerator() => new(element);
+        public Return<T> GetEnumerator() => new(element, done);
 
         public T Current
         {
@@ -28,15 +35,15 @@ namespace Cathei.QuickLinq.Operations
         public bool MoveNext() => !done && (done = true);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => done = false;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() { }
 
-        public bool IsCollection => true;
+        public bool CanCount => true;
 
-        public int Count => 1;
+        public int MaxCount => 1;
 
-        public T Get(int _) => element;
+        public bool CanSlice => true;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Return<T> GetSliceEnumerator(int skip, int take) => new(element, skip > 0);
     }
 }

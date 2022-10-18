@@ -9,47 +9,50 @@ namespace Cathei.QuickLinq.Operations
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         private TOperation source;
-        private readonly int take;
-        private int index;
+        private int count;
 
-        internal Take(in TOperation source, int take)
+        internal Take(in TOperation source, int count)
         {
             this.source = source;
-            this.take = take;
-            index = -1;
+            this.count = count;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Take<T, TOperation> GetEnumerator() => new(source.GetEnumerator(), take);
+        public Take<T, TOperation> GetEnumerator()
+        {
+            return CanSlice ? GetSliceEnumerator(0, count) : new(source.GetEnumerator(), count);
+        }
 
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsCollection ? Get(index) : source.Current;
+            get => source.Current;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
-            if (++index >= take)
+            if (--count < 0)
                 return false;
-
-            if (IsCollection)
-                return index < source.Count;
 
             return source.MoveNext();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => source.Reset();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
 
-        public bool IsCollection => source.IsCollection;
+        public bool CanCount => source.CanCount;
 
-        public int Count => Math.Max(take, source.Count);
+        public int MaxCount => Math.Min(count, source.MaxCount);
 
-        public T Get(int i) => source.Get(i);
+        public bool CanSlice => source.CanSlice;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Take<T, TOperation> GetSliceEnumerator(int skip, int take)
+        {
+            // trying to boost performance by using source's slicing feature
+            // count parameter is meaningless in this case
+            return new(source.GetSliceEnumerator(skip, Math.Min(count - skip, take)), take);
+        }
     }
 }

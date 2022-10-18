@@ -6,22 +6,22 @@
 ### Results:
 ``` ini
 
-BenchmarkDotNet=v0.13.2, OS=macOS Monterey 12.3 (21E230) [Darwin 21.4.0]
-Apple M1 Pro, 1 CPU, 10 logical and 10 physical cores
-.NET SDK=6.0.200
-  [Host]     : .NET 6.0.2 (6.0.222.6406), Arm64 RyuJIT AdvSIMD
-  DefaultJob : .NET 6.0.2 (6.0.222.6406), Arm64 RyuJIT AdvSIMD
+BenchmarkDotNet=v0.13.2, OS=Windows 10 (10.0.19043.2130/21H1/May2021Update)
+AMD Ryzen 5 3600, 1 CPU, 12 logical and 6 physical cores
+.NET SDK=6.0.101
+  [Host]     : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT AVX2
+  DefaultJob : .NET 6.0.1 (6.0.121.56705), X64 RyuJIT AVX2
 
 
 ```
-|             Method |      Mean |     Error |    StdDev | Ratio |   Gen0 | Allocated | Alloc Ratio |
-|------------------- |----------:|----------:|----------:|------:|-------:|----------:|------------:|
-|            ForLoop |  9.458 μs | 0.0332 μs | 0.0277 μs |  0.24 |      - |         - |        0.00 |
-|        ForEachLoop | 25.831 μs | 0.1788 μs | 0.1585 μs |  0.66 |      - |      40 B |        0.45 |
-|               Linq | 38.936 μs | 0.0376 μs | 0.0314 μs |  1.00 |      - |      88 B |        1.00 |
-|  QuickLinqDelegate | 26.372 μs | 0.1208 μs | 0.1130 μs |  0.68 |      - |         - |        0.00 |
-|    QuickLinqStruct | 11.757 μs | 0.0402 μs | 0.0376 μs |  0.30 |      - |         - |        0.00 |
-| StructLinqDelegate | 14.312 μs | 0.1058 μs | 0.0990 μs |  0.37 | 0.0153 |      56 B |        0.64 |
-|   StructLinqStruct |  9.403 μs | 0.0050 μs | 0.0047 μs |  0.24 |      - |         - |        0.00 |
-|  HyperLinqDelegate | 34.653 μs | 0.0744 μs | 0.0660 μs |  0.89 |      - |         - |        0.00 |
-|    HyperLinqStruct | 34.722 μs | 0.0911 μs | 0.0852 μs |  0.89 |      - |         - |        0.00 |
+|             Method |      Mean |     Error |    StdDev |    Median | Ratio | RatioSD | Allocated | Alloc Ratio |
+|------------------- |----------:|----------:|----------:|----------:|------:|--------:|----------:|------------:|
+|            ForLoop |  7.597 μs | 0.0467 μs | 0.0437 μs |  7.573 μs |  0.15 |    0.00 |         - |        0.00 |
+|        ForEachLoop | 39.309 μs | 0.6655 μs | 0.6225 μs | 39.233 μs |  0.75 |    0.02 |      40 B |        0.45 |
+|               Linq | 52.246 μs | 0.8747 μs | 0.7304 μs | 51.933 μs |  1.00 |    0.00 |      88 B |        1.00 |
+|  QuickLinqDelegate | 18.130 μs | 0.3350 μs | 0.6125 μs | 17.819 μs |  0.35 |    0.01 |         - |        0.00 |
+|    QuickLinqStruct |  9.916 μs | 0.7830 μs | 2.2963 μs |  9.006 μs |  0.18 |    0.04 |         - |        0.00 |
+| StructLinqDelegate | 15.154 μs | 0.0589 μs | 0.0492 μs | 15.139 μs |  0.29 |    0.00 |      56 B |        0.64 |
+|   StructLinqStruct |  7.543 μs | 0.0356 μs | 0.0333 μs |  7.530 μs |  0.14 |    0.00 |         - |        0.00 |
+|  HyperLinqDelegate | 28.027 μs | 0.3662 μs | 0.3426 μs | 27.931 μs |  0.54 |    0.01 |         - |        0.00 |
+|    HyperLinqStruct | 27.389 μs | 0.0988 μs | 0.0924 μs | 27.400 μs |  0.52 |    0.01 |         - |        0.00 |

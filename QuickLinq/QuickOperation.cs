@@ -12,7 +12,7 @@ namespace Cathei.QuickLinq
     /// IQuickOperation is both IEnumerable and IEnumerator.
     /// This approach will simplify generic type information.
     /// </summary>
-    public interface IQuickOperation<out T, out TSelf> : IEnumerable<T>, IEnumerator<T>
+    public interface IQuickOperation<out T, out TSelf> : IQuickSlice<TSelf>, IEnumerable<T>, IEnumerator<T>
         where TSelf : struct, IQuickOperation<T, TSelf>
     {
         new TSelf GetEnumerator();
@@ -21,27 +21,42 @@ namespace Cathei.QuickLinq
         object? IEnumerator.Current => Current;
 
         // interface default implementation
+        void IEnumerator.Reset() => throw new NotSupportedException();
+
+        // interface default implementation
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         // interface default implementation
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        /// <summary>
-        /// Collection optimization
-        /// Count and Get is only valid when IsCollection is true
-        /// </summary>
-        bool IsCollection { get; }
-
-        /// <summary>
-        /// Collection optimization
-        /// Only valid when IsCollection is true
-        /// </summary>
-        int Count => throw new NotSupportedException();
-
-        /// <summary>
-        /// Collection optimization
-        /// Only valid when IsCollection is true
-        /// </summary>
-        T Get(int i) => throw new NotSupportedException();
     }
+
+    public interface IQuickSlice<out TSelf>
+        where TSelf : struct, IQuickSlice<TSelf>
+    {
+        /// <summary>
+        /// Collection optimization
+        /// CanCount operation should be always CanSlice as well
+        /// </summary>
+        bool CanCount { get; }
+
+        /// <summary>
+        /// Collection optimization
+        /// Only valid when CanCount is true
+        /// </summary>
+        int MaxCount => throw new NotSupportedException();
+
+        /// <summary>
+        /// Collection optimization
+        /// GetSliceEnumerator is only valid when IsCollection is true
+        /// </summary>
+        bool CanSlice { get; }
+
+        /// <summary>
+        /// Collection optimization
+        /// Only valid when CanSlice is true
+        /// Skip + Take can exceed MaxCount
+        /// </summary>
+        TSelf GetSliceEnumerator(int skip, int take) => throw new NotSupportedException();
+    }
+
 }

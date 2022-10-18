@@ -10,17 +10,32 @@ namespace Cathei.QuickLinq.Operations
     {
         private TFirst first;
         private TSecond second;
-        private bool firstDone;
 
-        internal Concat(in TFirst first, in TSecond second)
+        private bool firstDone;
+        private int takeCount;
+
+        // enumerable constructor
+        internal Concat(in TFirst first, in TSecond second) : this()
         {
             this.first = first;
             this.second = second;
-            firstDone = false;
+        }
+
+        // enumerator constructor
+        private Concat(in TFirst first, in TSecond second, bool firstDone, int takeCount)
+        {
+            this.first = first;
+            this.second = second;
+            this.firstDone = firstDone;
+            this.takeCount = takeCount;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Concat<T, TFirst, TSecond> GetEnumerator() => new(first.GetEnumerator(), second.GetEnumerator());
+        public Concat<T, TFirst, TSecond> GetEnumerator()
+        {
+            // second will deferred enumerated
+            return new(first.GetEnumerator(), second, false, int.MaxValue);
+        }
 
         public T Current
         {
@@ -31,22 +46,22 @@ namespace Cathei.QuickLinq.Operations
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool MoveNext()
         {
+            if (--takeCount < 0)
+                return false;
+
             if (!firstDone)
             {
                 if (first.MoveNext())
                     return true;
+
                 firstDone = true;
+
+                // deferred execution of second enumerable
+                // compensate takeCount (already decreased) if we can slice second one
+                second = second.CanSlice ? second.GetSliceEnumerator(0, takeCount + 1) : second.GetEnumerator();
             }
 
             return second.MoveNext();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset()
-        {
-            first.Reset();
-            second.Reset();
-            firstDone = false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -56,10 +71,26 @@ namespace Cathei.QuickLinq.Operations
             second.Dispose();
         }
 
-        public bool IsCollection => first.IsCollection && second.IsCollection;
+        public bool CanCount => first.CanCount && second.CanCount;
 
-        public int Count => first.Count + second.Count;
+        public int MaxCount => first.MaxCount + second.MaxCount;
 
-        public T Get(int index) => index < first.Count ? first.Get(index) : second.Get(index);
+        public bool CanSlice => first.CanSlice && second.CanSlice;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Concat<T, TFirst, TSecond> GetSliceEnumerator(int skip, int take)
+        {
+            if (first.CanCount)
+            {
+                int firstCount = first.MaxCount;
+
+                // first will not be enumerated
+                if (skip >= firstCount)
+                    return new(default, second.GetSliceEnumerator(skip - firstCount, take), true, take);
+            }
+
+            // second will deferred initialized
+            return new(first.GetSliceEnumerator(skip, take), second, false, take);
+        }
     }
 }

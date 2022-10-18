@@ -13,8 +13,8 @@ namespace Cathei.QuickLinq
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Count()
         {
-            if (source.IsCollection)
-                return source.Count;
+            if (source.CanSlice)
+                return source.SliceMax;
 
             using var enumerator = GetEnumerator();
             int count = 0;

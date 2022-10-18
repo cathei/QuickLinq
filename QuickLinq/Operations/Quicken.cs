@@ -32,11 +32,10 @@ namespace Cathei.QuickLinq.Quick
         public bool MoveNext() => enumerator!.MoveNext();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => enumerator!.Reset();
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => enumerator!.Dispose();
 
-        public bool IsCollection => false;
+        public bool CanCount => false;
+
+        public bool CanSlice => false;
     }
 }

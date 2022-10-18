@@ -40,19 +40,16 @@ namespace Cathei.QuickLinq.Operations
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset()
-        {
-            source.Reset();
-            index = -1;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
 
-        public bool IsCollection => source.IsCollection;
+        public bool CanCount => source.CanCount;
 
-        public int Count => source.Count;
+        public int MaxCount => source.MaxCount;
 
-        public TOut Get(int i) => selector.Invoke(source.Get(i), i);
+        public bool CanSlice => source.CanSlice;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public SelectAt<TIn, TOut, TOperation, TFunc> GetSliceEnumerator(int skip, int take)
+            => new(source.GetSliceEnumerator(skip, take), selector);
     }
 }

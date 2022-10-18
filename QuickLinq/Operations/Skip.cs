@@ -8,54 +8,61 @@ namespace Cathei.QuickLinq.Operations
         where TOperation : struct, IQuickOperation<T, TOperation>
     {
         private TOperation source;
-        private readonly int skip;
-        private int index;
+        private readonly int count;
 
-        internal Skip(in TOperation source, int skip)
+        // enumerable constructor
+        internal Skip(in TOperation source, int count)
         {
             this.source = source;
-            this.skip = skip;
-            index = -1;
+            this.count = count;
+        }
+
+        // enumerator constructor
+        private Skip(in TOperation source) : this()
+        {
+            this.source = source;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Skip<T, TOperation> GetEnumerator() => new(source.GetEnumerator(), skip);
+        public Skip<T, TOperation> GetEnumerator()
+        {
+            if (CanSlice)
+                return GetSliceEnumerator(0, int.MaxValue);
+
+            var enumerator = source.GetEnumerator();
+
+            // move starting point
+            for (int i = 0; i < count; ++i)
+            {
+                if (!source.MoveNext())
+                    break;
+            }
+
+            return new(enumerator);
+        }
 
         public T Current
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => IsCollection ? Get(index) : source.Current;
+            get => source.Current;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool MoveNext()
-        {
-            ++index;
-
-            if (IsCollection)
-                return index < Count;
-
-            while (index < skip)
-            {
-                if (!source.MoveNext())
-                    return false;
-
-                ++index;
-            }
-
-            return source.MoveNext();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Reset() => source.Reset();
+        public bool MoveNext() => source.MoveNext();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose() => source.Dispose();
 
-        public bool IsCollection => source.IsCollection;
+        public bool CanCount => source.CanCount;
 
-        public int Count => source.Count - skip;
+        public int MaxCount => source.MaxCount - count;
 
-        public T Get(int i) => source.Get(skip + i);
+        public bool CanSlice => source.CanSlice;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Skip<T, TOperation> GetSliceEnumerator(int skip, int take)
+        {
+            return new(source.GetSliceEnumerator(skip + count, take));
+        }
     }
 }
