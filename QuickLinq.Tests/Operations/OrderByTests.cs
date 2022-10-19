@@ -57,9 +57,9 @@ public static class OrderByTestData
 
 }
 
-public class OrderByTests : OperationTestBase<int, OrderBy<int, Wrap<int, Comparer<int>>, Quicken<int>>>
+public class OrderByTests : OperationTestBase<int, OrderBy<int, Wrap<int>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, Wrap<int, Comparer<int>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Wrap<int>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Reverse().Quicken().OrderBy();
     }
@@ -76,9 +76,9 @@ public class OrderByTests : OperationTestBase<int, OrderBy<int, Wrap<int, Compar
     }
 }
 
-public class OrderByDescTests : OperationTestBase<int, OrderBy<int, WrapDesc<int, Comparer<int>>, Quicken<int>>>
+public class OrderByDescTests : OperationTestBase<int, OrderBy<int, WrapDesc<int>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, WrapDesc<int, Comparer<int>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, WrapDesc<int>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Quicken().OrderByDescending();
     }
@@ -95,9 +95,9 @@ public class OrderByDescTests : OperationTestBase<int, OrderBy<int, WrapDesc<int
     }
 }
 
-public class OrderByKeyTests : OperationTestBase<int, OrderBy<int, Map<int, double, Call<int, double>, Comparer<double>>, Quicken<int>>>
+public class OrderByKeyTests : OperationTestBase<int, OrderBy<int, Map<int, double>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, Map<int, double, Call<int, double>, Comparer<double>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Map<int, double>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Reverse().Quicken().
             OrderBy(x => Math.Abs(x * 2.0));
@@ -115,17 +115,12 @@ public class OrderByKeyTests : OperationTestBase<int, OrderBy<int, Map<int, doub
     }
 }
 
-public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<int, double, Call<int, double>, Comparer<double>>, Quicken<int>>>
+public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>>
 {
-    protected override QuickEnumerable<int, OrderBy<int, MapDesc<int, double, Call<int, double>, Comparer<double>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, MapDesc<int, double>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Quicken().
             OrderByDescending(x => Math.Abs(x * 2.0));
-    }
-
-    public struct Selector : IQuickFunction<double, double>
-    {
-        public double Invoke(double arg) => -arg;
     }
 
     [Test]
@@ -134,17 +129,17 @@ public class OrderByKeyDescTests : OperationTestBase<int, OrderBy<int, MapDesc<i
         [ValueSource(typeof(OrderByTestData), nameof(OrderByTestData.Comparers))] IComparer<double> comparer)
     {
         var linqQuery = data.OrderByDescending(x => -x, comparer);
-        var quickQuery = data.Quicken().OrderByDescending(new Selector(), comparer, x => x);
+        var quickQuery = data.Quicken().OrderByDescending(x => -x, comparer);
 
         CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
     }
 }
 
-public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<int, ThenByTests.Comparer>, MapDesc<int, int, Call<int, int>, Comparer<int>>>, Quicken<int>>>
+public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<int, ThenByTests.Comparer>, WrapDesc<int>>, Quicken<int>>>
 {
-    public struct Comparer : IComparer<int>
+    public struct Comparer : IQuickFunction<int, int, int>
     {
-        public int Compare(int x, int y)
+        public int Invoke(int x, int y)
         {
             x %= 2;
             y %= 2;
@@ -152,10 +147,10 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
         }
     }
 
-    protected override QuickEnumerable<int, OrderBy<int, Then<int, Wrap<int, Comparer>, MapDesc<int, int, Call<int, int>, Comparer<int>>>, Quicken<int>>> Build(int size)
+    protected override QuickEnumerable<int, OrderBy<int, Then<int, Wrap<int, Comparer>, WrapDesc<int>>, Quicken<int>>> Build(int size)
     {
         return Enumerable.Range(-2, size).Reverse().Quicken().
-            OrderBy(new Comparer()).ThenByDescending(x => x);
+            OrderBy(new Comparer()).ThenByDescending();
     }
 
     [Test]
@@ -168,7 +163,7 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
             .ThenBy(x => x.Item2);
 
         var quickQuery = data.Quicken()
-            .OrderByDescending(x => (double)-x.Item1, comparer)
+            .OrderByDescending(x => -x.Item1, comparer)
             .ThenBy(x => x.Item2);
 
         CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());
@@ -184,7 +179,7 @@ public class ThenByTests : OperationTestBase<int, OrderBy<int, Then<int, Wrap<in
             .ThenByDescending(x => x.Item2);
 
         var quickQuery = data.Quicken()
-            .OrderBy(x => (double)-x.Item1, comparer)
+            .OrderBy(x => -x.Item1, comparer)
             .ThenByDescending(x => x.Item2);
 
         CollectionAssert.AreEqual(linqQuery, quickQuery.AsEnumerable());

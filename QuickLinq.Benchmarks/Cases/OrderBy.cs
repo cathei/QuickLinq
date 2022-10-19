@@ -89,8 +89,15 @@ public class OrderBy : OrderByBenchmarkBase
             .Sum(x => x);
     }
 
-    readonly struct Comparer : IComparer<int>
+    readonly struct Comparer :
+        IQuickFunction<int, int, int>,
+        IComparer<int>
     {
+        public int Invoke(int arg1, int arg2)
+        {
+            return arg1 - arg2;
+        }
+
         public int Compare(int x, int y)
         {
             return x - y;
