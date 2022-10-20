@@ -9,25 +9,23 @@ namespace Cathei.QuickLinq
 {
     /// <summary>
     /// The base class for all operations.
-    /// IQuickOperation is both IEnumerable and IEnumerator.
+    /// IQuickOperation is both Enumerable and Enumerator.
     /// This approach will simplify generic type information.
     /// </summary>
-    public interface IQuickOperation<out T, out TSelf> : IQuickSlice<TSelf>, IEnumerable<T>, IEnumerator<T>
-        where TSelf : struct, IQuickOperation<T, TSelf>
+    public interface IQuickOperation<out TSelf> : IQuickSlice<TSelf>, IDisposable
+        where TSelf : struct, IQuickOperation<TSelf>
     {
-        new TSelf GetEnumerator();
+        /// <summary>
+        /// Same as IEnumerator.MoveNext.
+        /// </summary>
+        bool MoveNext();
 
-        // interface default implementation
-        object? IEnumerator.Current => Current;
+        /// <summary>
+        /// Same as IEnumerator.Current with casting.
+        /// </summary>
+        T GetCurrent<T>();
 
-        // interface default implementation
-        void IEnumerator.Reset() => throw new NotSupportedException();
-
-        // interface default implementation
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
-
-        // interface default implementation
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        TSelf GetEnumerator();
     }
 
     public interface IQuickSlice<out TSelf>

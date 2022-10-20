@@ -14,7 +14,7 @@ namespace Cathei.QuickLinq
         {
             PooledList<T> list = new PooledList<T>(source.CanCount ? source.MaxCount : 0);
 
-            foreach (var elem in source)
+            foreach (var elem in this)
                 list.Add(elem);
 
             var array = list.ToArray();

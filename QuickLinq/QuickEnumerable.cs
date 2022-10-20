@@ -11,8 +11,8 @@ using Cathei.QuickLinq.Operations;
 
 namespace Cathei.QuickLinq
 {
-    public partial struct QuickEnumerable<T, TOperation> // : IEnumerable<T>
-        where TOperation : struct, IQuickOperation<T, TOperation>
+    public partial struct QuickEnumerable<T, TOperation>
+        where TOperation : struct, IQuickOperation<TOperation>
     {
         internal TOperation source;
 
@@ -31,7 +31,7 @@ namespace Cathei.QuickLinq
         /// Convert to IEnumerable interface, causes boxing.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IEnumerable<T> AsEnumerable() => source;
+        public BoxedQuickEnumerable<T, TOperation> AsEnumerable() => new(source);
 
         /// <summary>
         /// Map value with struct function selector.
